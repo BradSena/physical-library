@@ -1,0 +1,30 @@
+name: Physical Library
+version: "0.1.0"
+slug: physical_library
+description: Catalogue de disques physiques avec export Kodi
+url: "https://github.com/yourname/physical-library"
+arch:
+  - aarch64
+  - amd64
+  - armv7
+startup: services
+boot: auto
+init: false
+ports:
+  8099/tcp: 8099
+ports_description:
+  8099/tcp: Interface Web
+map:
+  - addon_config:rw
+  - media:rw
+options:
+  tmdb_api_key: ""
+  upcitemdb_api_key: ""
+  barcodelookup_api_key: ""
+  ha_webhook_url: ""
+schema:
+  tmdb_api_key: str?
+  upcitemdb_api_key: str?
+  barcodelookup_api_key: str?
+  ha_webhook_url: str?
+webui: "http://[HOST]:[PORT:8099]"

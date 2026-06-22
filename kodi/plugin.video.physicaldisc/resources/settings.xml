@@ -1,0 +1,9 @@
+<settings version="1">
+  <section id="plugin.video.physicaldisc">
+    <category id="general" label="General">
+      <group id="1">
+        <setting id="backend_url" type="string" label="Backend URL" default="http://homeassistant.local:8099" />
+      </group>
+    </category>
+  </section>
+</settings>

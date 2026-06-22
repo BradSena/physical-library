@@ -1,0 +1,17 @@
+alias: Physical Disc Requested
+description: Exemple d'automation déclenchée par le webhook du catalogue
+triggers:
+  - trigger: webhook
+    webhook_id: physical_disc_requested
+    allowed_methods:
+      - POST
+    local_only: false
+actions:
+  - action: persistent_notification.create
+    data:
+      title: "Disque demandé"
+      message: >
+        Insérer {{ trigger.json.title }} — {{ trigger.json.support }}.
+        Emplacement: {{ trigger.json.original_location }}
+  # Plus tard : changer l'entrée AVR, ouvrir tiroir, allumer lecteur, etc.
+mode: single
