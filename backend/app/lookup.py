@@ -50,11 +50,52 @@ def guess_media_type(text: str) -> str:
         return "dvd"
     return "bluray"
 
+async def lookup_eansearch(barcode: str):
+    url = f"https://api.ean-search.org/api?op=barcode-lookup&format=json&ean={barcode}"
+
+    try:
+        async with httpx.AsyncClient(timeout=8) as client:
+            r = await client.get(url)
+
+        if r.status_code != 200:
+            return None
+
+        data = r.json()
+
+        if not data:
+            return None
+
+        title = data.get("name") or data.get("productname")
+        if not title:
+            return None
+
+        return {
+            "barcode": barcode,
+            "title": clean_title(title),
+            "year": extract_year(title),
+            "media_type": guess_media_type(title),
+        }
+
+    except Exception:
+        return None
 
 async def lookup_barcode(barcode: str) -> dict:
+    # 1. UPCItemDB
     result = await lookup_upcitemdb(barcode)
-
     if result:
+        result["source"] = "UPCItemDB"
+        result["confidence"] = 0.75
+        return {
+            "found": True,
+            "result": result,
+            "candidates": [result],
+        }
+
+    # 2. EAN-Search
+    result = await lookup_eansearch(barcode)
+    if result:
+        result["source"] = "EAN-Search"
+        result["confidence"] = 0.85
         return {
             "found": True,
             "result": result,
@@ -66,5 +107,5 @@ async def lookup_barcode(barcode: str) -> dict:
         "result": None,
         "candidates": [],
         "manual_required": True,
-        "message": "Barcode not recognized. Manual entry required.",
+        "message": "Barcode not recognized.",
     }

@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from app.lookup import lookup_barcode
+
+from app.lookup.search import lookup
 
 
 DB_PATH = Path("avatra.db")
@@ -74,8 +75,8 @@ def api_root():
     }
 
 @app.get("/lookup/{barcode}")
-async def lookup(barcode: str):
-    return await lookup_barcode(barcode)
+def barcode_lookup(barcode: str):
+    return lookup(barcode)
 
 @app.get("/items")
 def list_items():
