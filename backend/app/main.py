@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 
@@ -21,9 +23,16 @@ app = FastAPI(
 
 items: list[PhysicalItem] = []
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
 
 @app.get("/")
-def root():
+def web_app():
+    return FileResponse("app/static/index.html")
+
+
+@app.get("/api")
+def api_root():
     return {
         "name": "Avatra",
         "tagline": "Digital avatars for your physical media.",

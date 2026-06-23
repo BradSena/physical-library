@@ -1,10 +1,10 @@
-# Physical Library
+# Avatra
 
-> The missing bridge between your physical movie collection and Kodi.
+> Digital avatars for your physical media.
 
-Physical Library is a self-hosted application designed for collectors who own Blu-rays, DVDs and UHD Blu-rays and want the convenience of a modern media library **without ripping hundreds of discs**.
+Avatra is a self-hosted application designed for collectors who own Blu-rays, DVDs and UHD Blu-rays and want the convenience of a modern media library **without ripping hundreds of discs**.
 
-Instead of storing movies on hard drives, Physical Library lets Kodi display your physical collection exactly like a digital library while keeping every movie on its original disc.
+Instead of storing movies on hard drives, Avatra lets Kodi display your physical collection exactly like a digital library while keeping every movie on its original disc.
 
 ---
 
@@ -14,7 +14,7 @@ Most collection managers focus on cataloging.
 
 Most media centers focus on digital files.
 
-Physical Library connects both worlds.
+Avatra connects both worlds.
 
 Browse your movies from Kodi.
 
@@ -56,7 +56,7 @@ Designed to catalog **hundreds of discs quickly**.
 
 ### 🎬 Kodi integration
 
-Physical Library exports virtual movie entries.
+Avatra exports virtual movie entries.
 
 Kodi remains responsible for:
 
@@ -68,7 +68,7 @@ Kodi remains responsible for:
 - Collections
 - Movie browsing
 
-Physical Library only manages the physical media.
+Avatra only manages the physical media.
 
 ---
 
@@ -83,19 +83,19 @@ Optional Home Assistant integration allows automations such as:
 
 Home Assistant coordinates the hardware.
 
-Physical Library owns the catalog.
+Avatra owns the catalog.
 
 ---
 
 ## Design philosophy
 
-Physical Library intentionally **does not replace Kodi**.
+Avatra intentionally **does not replace Kodi**.
 
 Instead, it complements Kodi by solving one specific problem:
 
 Managing physical movie collections.
 
-If Kodi already does something well, Physical Library does not duplicate it.
+If Kodi already does something well, Avatra does not duplicate it.
 
 ---
 

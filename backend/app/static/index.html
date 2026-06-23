@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Avatra</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; }
+    input, select, button { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; }
+    button { cursor: pointer; }
+    .item { border: 1px solid #ddd; padding: 12px; margin-top: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Avatra</h1>
+  <p>Digital avatars for your physical media.</p>
+
+  <h2>Add a disc</h2>
+
+  <input id="barcode" placeholder="Barcode">
+  <input id="title" placeholder="Title">
+  <input id="year" placeholder="Year">
+  <select id="media_type">
+    <option value="bluray">Blu-ray</option>
+    <option value="uhd">UHD Blu-ray</option>
+    <option value="dvd">DVD</option>
+  </select>
+  <input id="original_location" placeholder="Original location, e.g. A1-001">
+
+  <button onclick="addItem()">Add disc</button>
+
+  <h2>Collection</h2>
+  <div id="items"></div>
+
+<script>
+async function loadItems() {
+  const res = await fetch('/items');
+  const items = await res.json();
+  const container = document.getElementById('items');
+
+  if (items.length === 0) {
+    container.innerHTML = '<p>No discs yet.</p>';
+    return;
+  }
+
+  container.innerHTML = items.map(item => `
+    <div class="item">
+      <strong>${item.title}</strong> (${item.year || 'unknown'})
+      <br>
+      ${item.media_type} — ${item.original_location || 'no location'}
+      <br>
+      Barcode: ${item.barcode || 'none'}
+    </div>
+  `).join('');
+}
+
+async function addItem() {
+  const item = {
+    barcode: document.getElementById('barcode').value || null,
+    title: document.getElementById('title').value,
+    year: document.getElementById('year').value ? Number(document.getElementById('year').value) : null,
+    media_type: document.getElementById('media_type').value,
+    original_location: document.getElementById('original_location').value || null,
+    current_state: 'in_stock'
+  };
+
+  await fetch('/items', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(item)
+  });
+
+  document.getElementById('barcode').value = '';
+  document.getElementById('title').value = '';
+  document.getElementById('year').value = '';
+  document.getElementById('original_location').value = '';
+
+  loadItems();
+}
+
+loadItems();
+</script>
+</body>
+</html>
