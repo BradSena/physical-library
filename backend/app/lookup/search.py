@@ -1,29 +1,7 @@
-from app.lookup.providers import SearchResult
 from app.lookup.consensus import choose_best
+from app.lookup.searx import search_searx
 
 
-def lookup(barcode: str):
-
-    # TODO : remplacer par les vrais providers
-    results = [
-        SearchResult(
-            source="DVDfr",
-            title="La Collection des Courts Métrages Pixar - Volume 2",
-            url="https://www.dvdfr.com/",
-            score=10,
-        ),
-        SearchResult(
-            source="Fnac",
-            title="La Collection des Courts Métrages Pixar - Volume 2",
-            url="https://www.fnac.com/",
-            score=8,
-        ),
-        SearchResult(
-            source="Amazon",
-            title="Pixar Short Films Collection Volume 2",
-            url="https://www.amazon.fr/",
-            score=6,
-        ),
-    ]
-
+async def lookup(barcode: str):
+    results = await search_searx(barcode)
     return choose_best(results)

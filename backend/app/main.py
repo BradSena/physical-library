@@ -74,9 +74,11 @@ def api_root():
         "status": "running",
     }
 
+
 @app.get("/lookup/{barcode}")
-def barcode_lookup(barcode: str):
-    return lookup(barcode)
+async def barcode_lookup(barcode: str):
+    return await lookup(barcode)
+
 
 @app.get("/items")
 def list_items():
