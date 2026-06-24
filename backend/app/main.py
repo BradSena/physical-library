@@ -112,3 +112,30 @@ def create_item(item: PhysicalItem):
         conn.commit()
         item.id = cursor.lastrowid
         return item
+    
+@app.post("/scan/{barcode}")
+async def scan_barcode(barcode: str):
+    lookup_result = await lookup(barcode)
+
+    if not lookup_result.get("found"):
+        return {
+            "created": False,
+            "manual_required": True,
+            "message": "Barcode not recognized.",
+        }
+
+    result = lookup_result["result"]
+
+    item = PhysicalItem(
+        barcode=barcode,
+        title=result["title"],
+        year=result.get("year"),
+        media_type=result.get("media_type", "bluray"),
+        current_state="in_stock",
+    )
+
+    return {
+        "created": True,
+        "item": create_item(item),
+        "lookup": lookup_result,
+    }
