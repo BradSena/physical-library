@@ -8,54 +8,86 @@ from app.lookup.providers import SearchResult
 
 
 def fix_mojibake(text: str) -> str:
-    if not text:
-        return ""
-
     replacements = {
-        "Ã©": "é",
-        "Ã¨": "è",
-        "Ãª": "ê",
-        "Ã ": "à",
-        "Ã¢": "â",
-        "Ã§": "ç",
-        "Ã´": "ô",
-        "Ã»": "û",
-        "Ã®": "î",
-        "Ã¯": "ï",
-        "â‚¬": "€",
+        "Ã©": "é", "Ã¨": "è", "Ãª": "ê", "Ã ": "à",
+        "Ã¢": "â", "Ã§": "ç", "Ã´": "ô", "Ã»": "û",
+        "Ã®": "î", "Ã¯": "ï", "â‚¬": "€",
     }
-
     for bad, good in replacements.items():
-        text = text.replace(bad, good)
-
+        text = (text or "").replace(bad, good)
     return text
+
+
+def extract_year(title: str) -> int | None:
+    match = re.search(r"\((19|20)\d{2}\)", title or "")
+    return int(match.group(0).strip("()")) if match else None
 
 
 def clean_dvdfr_title(title: str) -> str:
     title = fix_mojibake(title)
+    title = re.sub(r"\((19|20)\d{2}\)", "", title)
     title = re.sub(r"\s+", " ", title or "").strip()
     return title
+
+
+def media_type_from_detail_title(text: str) -> str:
+    text = (text or "").lower()
+    if "4k" in text or "ultra hd" in text or "uhd" in text:
+        return "uhd"
+    if "blu-ray" in text or "bluray" in text:
+        return "bluray"
+    if "dvd" in text:
+        return "dvd"
+    return "bluray"
 
 
 def looks_like_disc_result(title: str, href: str) -> bool:
     if not title or not href:
         return False
-
     if not href.startswith("/dvd/"):
         return False
-
-    clean_title = title.strip().lower()
-
-    if len(clean_title) < 8:
+    clean = title.strip().lower()
+    if len(clean) < 8:
         return False
-
-    if "€" in clean_title:
+    if "€" in clean:
         return False
-
-    if clean_title in {"blu-ray", "blu-ray 3d", "dvd", "hd dvd"}:
+    if clean in {"blu-ray", "blu-ray 3d", "dvd", "hd dvd"}:
         return False
-
     return True
+
+
+async def enrich_from_detail(client: httpx.AsyncClient, href: str, fallback_year: int | None):
+    detail_url = urljoin("https://www.dvdfr.com/", href)
+
+    try:
+        response = await client.get(
+            detail_url,
+            headers={"User-Agent": "Mozilla/5.0 Avatra/0.1"},
+        )
+    except Exception:
+        return fallback_year, "bluray"
+
+    if response.status_code != 200:
+        return fallback_year, "bluray"
+
+    response.encoding = "utf-8"
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    detail_title = soup.title.get_text(" ", strip=True) if soup.title else ""
+    media_type = media_type_from_detail_title(detail_title)
+
+    year = fallback_year
+    if year is None:
+        year_tag = soup.select_one(".commentLangue")
+        if year_tag:
+            year = extract_year(year_tag.get_text(" ", strip=True))
+
+    if year is None:
+        match = re.search(r'"releaseDate"\s*:\s*"(\d{2})/(\d{2})/((19|20)\d{2})"', response.text)
+        if match:
+            year = int(match.group(3))
+
+    return year, media_type
 
 
 async def search_dvdfr(barcode: str) -> list[SearchResult]:
@@ -70,28 +102,33 @@ async def search_dvdfr(barcode: str) -> list[SearchResult]:
             headers={"User-Agent": "Mozilla/5.0 Avatra/0.1"},
         )
 
-    if response.status_code != 200:
-        return []
+        if response.status_code != 200:
+            return []
 
-    response.encoding = "utf-8"
-    soup = BeautifulSoup(response.text, "html.parser")
+        response.encoding = "utf-8"
+        soup = BeautifulSoup(response.text, "html.parser")
 
-    candidates: list[SearchResult] = []
+        candidates: list[SearchResult] = []
 
-    for link in soup.find_all("a"):
-        title = link.get_text(" ", strip=True)
-        href = link.get("href") or ""
+        for link in soup.find_all("a"):
+            raw_title = link.get_text(" ", strip=True)
+            href = link.get("href") or ""
 
-        if not looks_like_disc_result(title, href):
-            continue
+            if not looks_like_disc_result(raw_title, href):
+                continue
 
-        candidates.append(
-            SearchResult(
-                source="DVDfr",
-                title=clean_dvdfr_title(title),
-                url=urljoin("https://www.dvdfr.com/", href),
-                score=10,
+            year = extract_year(raw_title)
+            year, media_type = await enrich_from_detail(client, href, year)
+
+            candidates.append(
+                SearchResult(
+                    source="DVDfr",
+                    title=clean_dvdfr_title(raw_title),
+                    url=urljoin("https://www.dvdfr.com/", href),
+                    score=10,
+                    year=year,
+                    media_type=media_type,
+                )
             )
-        )
 
     return candidates[:5]

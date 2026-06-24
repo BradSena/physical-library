@@ -62,7 +62,8 @@ async function loadItems() {
 }
 
 async function lookupBarcode() {
-  const barcode = document.getElementById('barcode').value.trim();
+  const barcodeInput = document.getElementById('barcode');
+  const barcode = barcodeInput.value.trim();
   const status = document.getElementById('status');
 
   if (!barcode) {
@@ -70,20 +71,28 @@ async function lookupBarcode() {
     return;
   }
 
-  status.textContent = 'Looking up barcode...';
+  status.textContent = 'Scanning and adding disc...';
 
-  const res = await fetch(`/lookup/${encodeURIComponent(barcode)}?t=${Date.now()}`);
+  const res = await fetch(`/scan/${encodeURIComponent(barcode)}`, {
+    method: 'POST'
+  });
+
   const data = await res.json();
 
-  if (!data.found || !data.result) {
+  if (!data.created || !data.item) {
     status.textContent = 'Not recognized. Manual entry required.';
+    document.getElementById('title').value = '';
     return;
   }
 
-  document.getElementById('title').value = data.result.title || '';
-  document.getElementById('year').value = data.result.year || '';
+  status.textContent = `Added: ${data.item.title}`;
 
-  status.textContent = `Found: ${data.result.title}`;
+  barcodeInput.value = '';
+  document.getElementById('title').value = '';
+  document.getElementById('year').value = '';
+
+  await loadItems();
+  barcodeInput.focus();
 }
 
 async function addItem() {

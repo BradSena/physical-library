@@ -7,3 +7,5 @@ class SearchResult:
     title: str
     url: str
     score: int = 1
+    year: int | None = None
+    media_type: str | None = None
