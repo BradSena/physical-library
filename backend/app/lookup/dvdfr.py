@@ -1,5 +1,5 @@
 import re
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urljoin
 
 import httpx
 from bs4 import BeautifulSoup
@@ -9,15 +9,29 @@ from app.lookup.providers import SearchResult
 
 def clean_dvdfr_title(title: str) -> str:
     title = re.sub(r"\s+", " ", title or "").strip()
-    title = re.sub(r"\s*-\s*Blu-ray\s*$", "", title, flags=re.I)
-    title = re.sub(r"\s*\[Blu-ray\]\s*$", "", title, flags=re.I)
-    return title.strip()
+    return title
+
+
+def looks_like_disc_result(title: str, href: str) -> bool:
+    if not title or not href:
+        return False
+
+    if not href.startswith("/dvd/"):
+        return False
+
+    if len(title.strip()) < 8:
+        return False
+
+    if "€" in title or "blu-ray" == title.strip().lower() or title.strip().lower() == "dvd":
+        return False
+
+    return True
 
 
 async def search_dvdfr(barcode: str) -> list[SearchResult]:
     url = (
-        "https://www.dvdfr.com/search/multisearch.php"
-        f"?multiname={quote_plus(barcode)}&x=29&y=10"
+    "https://www.dvdfr.com/listeliv.php"
+    f"?base=dvd&mots_recherche={quote_plus(barcode)}"
     )
 
     async with httpx.AsyncClient(timeout=10, follow_redirects=True) as client:
@@ -30,7 +44,6 @@ async def search_dvdfr(barcode: str) -> list[SearchResult]:
         return []
 
     soup = BeautifulSoup(response.text, "html.parser")
-    page_text = soup.get_text(" ", strip=True)
 
     candidates: list[SearchResult] = []
 
@@ -38,35 +51,17 @@ async def search_dvdfr(barcode: str) -> list[SearchResult]:
         title = link.get_text(" ", strip=True)
         href = link.get("href") or ""
 
-        if not title:
-            continue
-
-        if barcode not in page_text:
-            continue
-
-        if "blu-ray" not in title.lower() and "dvd" not in title.lower():
+        if not looks_like_disc_result(title, href):
             continue
 
         candidates.append(
             SearchResult(
                 source="DVDfr",
                 title=clean_dvdfr_title(title),
-                url=href,
+                url=urljoin("https://www.dvdfr.com/", href),
                 score=10,
             )
         )
-
-    # Fallback : si le titre est dans le <title> HTML
-    if not candidates:
-        html_title = soup.title.get_text(" ", strip=True) if soup.title else ""
-        if barcode in page_text and html_title:
-            candidates.append(
-                SearchResult(
-                    source="DVDfr",
-                    title=clean_dvdfr_title(html_title),
-                    url=url,
-                    score=8,
-                )
-            )
+    print("DVDfr candidates:", candidates)
 
     return candidates[:5]
