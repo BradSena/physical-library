@@ -9,15 +9,22 @@
     input, select, button { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; }
     button { cursor: pointer; }
     .item { border: 1px solid #ddd; padding: 12px; margin-top: 10px; border-radius: 8px; }
+    .status { padding: 10px; margin: 10px 0; border-radius: 8px; background: #f4f4f4; }
   </style>
 </head>
 <body>
   <h1>Avatra</h1>
   <p>Digital avatars for your physical media.</p>
 
+  <h2>Scan or enter barcode</h2>
+
+  <input id="barcode" placeholder="Barcode" autofocus>
+  <button onclick="lookupBarcode()">Lookup</button>
+
+  <div id="status" class="status">Waiting for barcode.</div>
+
   <h2>Add a disc</h2>
 
-  <input id="barcode" placeholder="Barcode">
   <input id="title" placeholder="Title">
   <input id="year" placeholder="Year">
   <select id="media_type">
@@ -25,7 +32,7 @@
     <option value="uhd">UHD Blu-ray</option>
     <option value="dvd">DVD</option>
   </select>
-  <input id="original_location" placeholder="Original location, e.g. A1-001">
+  <input id="original_location" placeholder="Storage zone, e.g. A2">
 
   <button onclick="addItem()">Add disc</button>
 
@@ -54,6 +61,31 @@ async function loadItems() {
   `).join('');
 }
 
+async function lookupBarcode() {
+  const barcode = document.getElementById('barcode').value.trim();
+  const status = document.getElementById('status');
+
+  if (!barcode) {
+    status.textContent = 'Enter or scan a barcode first.';
+    return;
+  }
+
+  status.textContent = 'Looking up barcode...';
+
+  const res = await fetch(`/lookup/${encodeURIComponent(barcode)}?t=${Date.now()}`);
+  const data = await res.json();
+
+  if (!data.found || !data.result) {
+    status.textContent = 'Not recognized. Manual entry required.';
+    return;
+  }
+
+  document.getElementById('title').value = data.result.title || '';
+  document.getElementById('year').value = data.result.year || '';
+
+  status.textContent = `Found: ${data.result.title}`;
+}
+
 async function addItem() {
   const item = {
     barcode: document.getElementById('barcode').value || null,
@@ -74,9 +106,17 @@ async function addItem() {
   document.getElementById('title').value = '';
   document.getElementById('year').value = '';
   document.getElementById('original_location').value = '';
+  document.getElementById('status').textContent = 'Disc added. Ready for next barcode.';
 
   loadItems();
+  document.getElementById('barcode').focus();
 }
+
+document.getElementById('barcode').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    lookupBarcode();
+  }
+});
 
 loadItems();
 </script>
