@@ -7,7 +7,32 @@ from bs4 import BeautifulSoup
 from app.lookup.providers import SearchResult
 
 
+def fix_mojibake(text: str) -> str:
+    if not text:
+        return ""
+
+    replacements = {
+        "Ã©": "é",
+        "Ã¨": "è",
+        "Ãª": "ê",
+        "Ã ": "à",
+        "Ã¢": "â",
+        "Ã§": "ç",
+        "Ã´": "ô",
+        "Ã»": "û",
+        "Ã®": "î",
+        "Ã¯": "ï",
+        "â‚¬": "€",
+    }
+
+    for bad, good in replacements.items():
+        text = text.replace(bad, good)
+
+    return text
+
+
 def clean_dvdfr_title(title: str) -> str:
+    title = fix_mojibake(title)
     title = re.sub(r"\s+", " ", title or "").strip()
     return title
 
@@ -19,10 +44,15 @@ def looks_like_disc_result(title: str, href: str) -> bool:
     if not href.startswith("/dvd/"):
         return False
 
-    if len(title.strip()) < 8:
+    clean_title = title.strip().lower()
+
+    if len(clean_title) < 8:
         return False
 
-    if "€" in title or "blu-ray" == title.strip().lower() or title.strip().lower() == "dvd":
+    if "€" in clean_title:
+        return False
+
+    if clean_title in {"blu-ray", "blu-ray 3d", "dvd", "hd dvd"}:
         return False
 
     return True
@@ -30,8 +60,8 @@ def looks_like_disc_result(title: str, href: str) -> bool:
 
 async def search_dvdfr(barcode: str) -> list[SearchResult]:
     url = (
-    "https://www.dvdfr.com/listeliv.php"
-    f"?base=dvd&mots_recherche={quote_plus(barcode)}"
+        "https://www.dvdfr.com/listeliv.php"
+        f"?base=dvd&mots_recherche={quote_plus(barcode)}"
     )
 
     async with httpx.AsyncClient(timeout=10, follow_redirects=True) as client:
@@ -43,6 +73,7 @@ async def search_dvdfr(barcode: str) -> list[SearchResult]:
     if response.status_code != 200:
         return []
 
+    response.encoding = "utf-8"
     soup = BeautifulSoup(response.text, "html.parser")
 
     candidates: list[SearchResult] = []
@@ -62,6 +93,5 @@ async def search_dvdfr(barcode: str) -> list[SearchResult]:
                 score=10,
             )
         )
-    print("DVDfr candidates:", candidates)
 
     return candidates[:5]
