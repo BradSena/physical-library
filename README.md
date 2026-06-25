@@ -182,53 +182,156 @@ Future versions will aggregate metadata from multiple providers and merge the mo
 
 ### Phase 1 – Inventory Foundation
 
+#### Core platform
+
 * [x] SQLite database
 * [x] FastAPI backend
 * [x] Basic web UI
-* [x] Barcode recognition
-* [x] DVDfr provider
-* [x] Automatic title extraction
-* [x] Automatic year extraction
-* [x] Automatic media type detection
+* [x] Barcode scanning
 * [x] Direct scan workflow
 * [x] Automatic insertion into database
 
-### Phase 2 – Collection Management
+#### First recognition provider
 
-* [ ] Duplicate detection
-* [ ] Automatic storage locations
-* [ ] Shelf sessions
-* [ ] Manual metadata editing
-* [ ] Bulk scanning workflow
-* [ ] Loan management
+* [x] DVDfr integration
+* [x] Automatic title extraction
+* [x] Automatic year extraction
+* [x] Automatic media type detection
 
-### Phase 3 – Metadata Enrichment
+---
 
-* [ ] Multi-provider recognition engine
-* [ ] Metadata aggregation
+### Phase 2 – Recognition Engine
+
+#### Multi-provider architecture
+
+* [ ] Pluggable provider system
+* [ ] DVDfr provider
+* [ ] Blu-ray.com provider
+* [ ] Additional community providers
+* [ ] Provider health monitoring
+
+#### Metadata aggregation
+
+* [ ] Consensus engine
+* [ ] Field-level confidence
+* [ ] Metadata merging
+* [ ] Conflict detection
+* [ ] Manual conflict resolution
+
+#### Technical metadata
+
 * [ ] Audio formats
 * [ ] Video formats
 * [ ] HDR metadata
-* [ ] Dolby Vision detection
-* [ ] Dolby Atmos detection
-* [ ] DTS:X detection
-* [ ] Language information
+* [ ] Dolby Vision
+* [ ] Dolby Atmos
+* [ ] DTS:X
+* [ ] Languages
+* [ ] Subtitles
 * [ ] Aspect ratio
+* [ ] Runtime
+* [ ] Edition identification
+
+---
+
+### Phase 3 – Collection Management
+
+#### Inventory workflow
+
+* [ ] Duplicate detection
+* [ ] Duplicate confirmation dialog
+* [ ] Manual metadata editing
+* [ ] Bulk scanning workflow
+* [ ] Shelf Sessions
+
+#### Storage management
+
+* [ ] Automatic storage locations
+* [ ] Location editor
+* [ ] Loan management
+* [ ] Display collections
+* [ ] Missing disc tracking
+
+#### Shelf visualization
+
+* [ ] Interactive shelf map
+* [ ] Highlight disc location
+* [ ] Empty slot visualization
+* [ ] Drag & drop shelf reorganization
+* [ ] Automatic renumbering after moves
+* [ ] Multi-room support
+* [ ] Shelf occupancy statistics
+
+---
 
 ### Phase 4 – Kodi Integration
 
+#### Library integration
+
 * [ ] STRM export
-* [ ] Kodi plugin
+* [ ] Automatic library synchronization
+* [ ] Collection synchronization
+
+#### Playback workflow
+
 * [ ] Physical disc launcher
-* [ ] Library synchronization
+* [ ] "Disc required" dialog
+* [ ] Display storage location
+* [ ] Display graphical shelf map
+* [ ] Open disc details
+* [ ] Launch Home Assistant actions
 
-### Phase 5 – Home Cinema Automation
+---
 
-* [ ] Home Assistant add-on
-* [ ] Blu-ray drive control
+### Phase 5 – Home Assistant Integration
+
+#### Smart Home
+
+* [ ] Official Home Assistant Add-on
+* [ ] REST API
+* [ ] Webhooks
 * [ ] Cinema mode automation
-* [ ] AVR integration
-* [ ] Projector integration
+* [ ] Blu-ray drive tray control
+* [ ] AVR control
+* [ ] Projector control
+* [ ] Lighting scenes
+
+---
+
+### Phase 6 – Smart Library
+
+#### LED-guided collection
+
+* [ ] ESPHome integration
+* [ ] Addressable LED support (WS2812 / SK6812)
+* [ ] Locate selected disc
+* [ ] Animated guidance
+* [ ] Highlight search results
+* [ ] Highlight an entire collection
+* [ ] Highlight movies by director
+* [ ] Highlight by audio format (Atmos, DTS:X...)
+* [ ] Highlight by custom filters
+
+#### Advanced visualization
+
+* [ ] Interactive shelf map inside Kodi
+* [ ] Display shelf map when selecting a movie
+* [ ] Real-time shelf occupancy
+* [ ] Shelf optimization suggestions
+* [ ] Collection heat map
+
+---
+
+### Phase 7 – Ecosystem
+
+* [ ] Backup & Restore
+* [ ] CSV Import / Export
+* [ ] Public REST API
+* [ ] Plugin system
+* [ ] Multi-user support
+* [ ] Permissions
+* [ ] Documentation
+
 
 ---
 
