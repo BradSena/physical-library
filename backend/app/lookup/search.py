@@ -1,8 +1,13 @@
-from app.lookup.consensus import choose_best
-from app.lookup.providers.dvdfr import search_dvdfr
+from app.lookup.engine import RecognitionEngine
+from app.lookup.providers.dvdfr import DVDfrProvider
+
+
+engine = RecognitionEngine(
+    providers=[
+        DVDfrProvider(),
+    ]
+)
 
 
 async def lookup(barcode: str):
-    results = []
-    results.extend(await search_dvdfr(barcode))
-    return choose_best(results)
+    return await engine.lookup(barcode)
