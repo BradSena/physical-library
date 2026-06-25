@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from app.lookup.providers import SearchResult
+from app.lookup.models import SearchResult
 
 
 def fix_mojibake(text: str) -> str:

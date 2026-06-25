@@ -1,6 +1,6 @@
 import httpx
 
-from app.lookup.providers import SearchResult
+from app.lookup.models import SearchResult
 
 
 SEARX_INSTANCE = "https://search.inetol.net"

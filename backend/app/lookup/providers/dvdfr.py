@@ -1,10 +1,11 @@
+from app.lookup.models import RecognitionProvider, SearchResult
 import re
 from urllib.parse import quote_plus, urljoin
 
 import httpx
 from bs4 import BeautifulSoup
 
-from app.lookup.providers import SearchResult
+from app.lookup.models import SearchResult
 
 
 def fix_mojibake(text: str) -> str:
@@ -132,3 +133,9 @@ async def search_dvdfr(barcode: str) -> list[SearchResult]:
             )
 
     return candidates[:5]
+
+class DVDfrProvider(RecognitionProvider):
+    name = "DVDfr"
+
+    async def search(self, barcode: str):
+        return await search_dvdfr(barcode)
