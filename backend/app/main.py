@@ -2,7 +2,7 @@ import json
 import sqlite3
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -24,6 +24,32 @@ TECHNICAL_METADATA_COLUMNS = {
     "region": "TEXT",
     "runtime": "INTEGER",
     "discs": "INTEGER",
+}
+
+LIST_METADATA_FIELDS = {
+    "hdr",
+    "audio_tracks",
+    "spoken_languages",
+    "subtitles",
+}
+
+EDITABLE_FIELDS = {
+    "title",
+    "year",
+    "media_type",
+    "edition_label",
+    "original_location",
+    "resolution",
+    "video_codec",
+    "hdr",
+    "aspect_ratio",
+    "original_aspect_ratio",
+    "audio_tracks",
+    "spoken_languages",
+    "subtitles",
+    "region",
+    "runtime",
+    "discs",
 }
 
 
@@ -51,6 +77,26 @@ class PhysicalItem(BaseModel):
     discs: int | None = None
 
 
+class PhysicalItemUpdate(BaseModel):
+    title: str | None = None
+    year: int | None = None
+    media_type: str | None = None
+    edition_label: str | None = None
+    original_location: str | None = None
+
+    resolution: str | None = None
+    video_codec: str | None = None
+    hdr: list[str] | None = None
+    aspect_ratio: str | None = None
+    original_aspect_ratio: str | None = None
+    audio_tracks: list[str] | None = None
+    spoken_languages: list[str] | None = None
+    subtitles: list[str] | None = None
+    region: str | None = None
+    runtime: int | None = None
+    discs: int | None = None
+
+
 app = FastAPI(title="Avatra", version="0.1.0")
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -58,6 +104,25 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 def encode_list_metadata(value: list[str] | None) -> str:
     return json.dumps(value or [])
+
+
+def decode_list_metadata(value: str | list[str] | None) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    try:
+        decoded = json.loads(value)
+    except json.JSONDecodeError:
+        return []
+    return decoded if isinstance(decoded, list) else []
+
+
+def item_from_row(row: sqlite3.Row) -> dict:
+    item = dict(row)
+    for field in LIST_METADATA_FIELDS:
+        item[field] = decode_list_metadata(item.get(field))
+    return item
 
 
 def get_connection():
@@ -137,7 +202,21 @@ async def barcode_lookup(barcode: str):
 def list_items():
     with get_connection() as conn:
         rows = conn.execute("SELECT * FROM physical_items ORDER BY id DESC").fetchall()
-        return [dict(row) for row in rows]
+        return [item_from_row(row) for row in rows]
+
+
+@app.get("/items/{item_id}")
+def get_item(item_id: int):
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT * FROM physical_items WHERE id = ?",
+            (item_id,),
+        ).fetchone()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Item not found.")
+
+    return item_from_row(row)
 
 
 @app.post("/items")
@@ -179,7 +258,42 @@ def create_item(item: PhysicalItem):
         conn.commit()
         item.id = cursor.lastrowid
         return item
-    
+
+
+@app.patch("/items/{item_id}")
+def update_item(item_id: int, item_update: PhysicalItemUpdate):
+    updates = item_update.model_dump(exclude_unset=True)
+    updates = {
+        key: value
+        for key, value in updates.items()
+        if key in EDITABLE_FIELDS
+    }
+
+    if not updates:
+        return get_item(item_id)
+
+    if "title" in updates and not updates["title"]:
+        raise HTTPException(status_code=400, detail="Title is required.")
+
+    values = [
+        encode_list_metadata(value) if field in LIST_METADATA_FIELDS else value
+        for field, value in updates.items()
+    ]
+    assignments = ", ".join(f"{field} = ?" for field in updates)
+
+    with get_connection() as conn:
+        cursor = conn.execute(
+            f"UPDATE physical_items SET {assignments} WHERE id = ?",
+            (*values, item_id),
+        )
+        conn.commit()
+
+    if cursor.rowcount == 0:
+        raise HTTPException(status_code=404, detail="Item not found.")
+
+    return get_item(item_id)
+
+
 @app.post("/scan/{barcode}")
 async def scan_barcode(barcode: str):
     lookup_result = await lookup(barcode)

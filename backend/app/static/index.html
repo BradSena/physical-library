@@ -9,7 +9,13 @@
     input, select, button { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; }
     button { cursor: pointer; }
     .item { border: 1px solid #ddd; padding: 12px; margin-top: 10px; border-radius: 8px; }
+    .metadata { color: #555; font-size: 14px; line-height: 1.5; margin-top: 6px; }
     .status { padding: 10px; margin: 10px 0; border-radius: 8px; background: #f4f4f4; }
+    .edit-panel { border: 1px solid #ddd; padding: 12px; margin: 16px 0; border-radius: 8px; background: #fafafa; }
+    .edit-grid { display: grid; gap: 8px; }
+    .edit-grid label { font-size: 14px; font-weight: 600; }
+    .edit-grid input, .edit-grid select { margin-top: 4px; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
@@ -22,6 +28,59 @@
   <button onclick="lookupBarcode()">Lookup</button>
 
   <div id="status" class="status">Waiting for barcode.</div>
+
+  <div id="last-scanned-panel" class="edit-panel hidden">
+    <h2>Edit last scanned item</h2>
+    <div class="edit-grid">
+      <label>Title
+        <input id="edit_title">
+      </label>
+      <label>Year
+        <input id="edit_year" type="number">
+      </label>
+      <label>Media type
+        <select id="edit_media_type">
+          <option value="bluray">Blu-ray</option>
+          <option value="uhd">UHD Blu-ray</option>
+          <option value="dvd">DVD</option>
+        </select>
+      </label>
+      <label>Original location
+        <input id="edit_original_location">
+      </label>
+      <label>Resolution
+        <input id="edit_resolution">
+      </label>
+      <label>Video codec
+        <input id="edit_video_codec">
+      </label>
+      <label>Aspect ratio
+        <input id="edit_aspect_ratio">
+      </label>
+      <label>Original aspect ratio
+        <input id="edit_original_aspect_ratio">
+      </label>
+      <label>Region
+        <input id="edit_region">
+      </label>
+      <label>Runtime
+        <input id="edit_runtime" type="number">
+      </label>
+      <label>Discs
+        <input id="edit_discs" type="number">
+      </label>
+      <label>HDR
+        <input id="edit_hdr">
+      </label>
+      <label>Audio tracks
+        <input id="edit_audio_tracks">
+      </label>
+      <label>Subtitles
+        <input id="edit_subtitles">
+      </label>
+    </div>
+    <button onclick="saveLastScannedItem()">Save</button>
+  </div>
 
   <h2>Add a disc</h2>
 
@@ -40,6 +99,77 @@
   <div id="items"></div>
 
 <script>
+let lastScannedItemId = null;
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function compactParts(item) {
+  return [
+    item.media_type,
+    item.resolution,
+    item.video_codec,
+    item.aspect_ratio ? `AR ${item.aspect_ratio}` : null,
+    item.original_aspect_ratio ? `Original AR ${item.original_aspect_ratio}` : null,
+    item.region ? `Region ${item.region}` : null,
+    item.runtime ? `${item.runtime} min` : null,
+    item.discs ? `${item.discs} disc${item.discs === 1 ? '' : 's'}` : null
+  ].filter(Boolean);
+}
+
+function listLine(label, values) {
+  if (!Array.isArray(values) || values.length === 0) {
+    return '';
+  }
+  return `<br>${label}: ${escapeHtml(values.join(', '))}`;
+}
+
+function commaText(values) {
+  return Array.isArray(values) ? values.join(', ') : '';
+}
+
+function commaArray(value) {
+  return value
+    .split(',')
+    .map(part => part.trim())
+    .filter(Boolean);
+}
+
+function optionalText(id) {
+  const value = document.getElementById(id).value.trim();
+  return value || null;
+}
+
+function optionalNumber(id) {
+  const value = document.getElementById(id).value.trim();
+  return value ? Number(value) : null;
+}
+
+function fillLastScannedPanel(item) {
+  lastScannedItemId = item.id;
+  document.getElementById('edit_title').value = item.title || '';
+  document.getElementById('edit_year').value = item.year || '';
+  document.getElementById('edit_media_type').value = item.media_type || 'bluray';
+  document.getElementById('edit_original_location').value = item.original_location || '';
+  document.getElementById('edit_resolution').value = item.resolution || '';
+  document.getElementById('edit_video_codec').value = item.video_codec || '';
+  document.getElementById('edit_aspect_ratio').value = item.aspect_ratio || '';
+  document.getElementById('edit_original_aspect_ratio').value = item.original_aspect_ratio || '';
+  document.getElementById('edit_region').value = item.region || '';
+  document.getElementById('edit_runtime').value = item.runtime || '';
+  document.getElementById('edit_discs').value = item.discs || '';
+  document.getElementById('edit_hdr').value = commaText(item.hdr);
+  document.getElementById('edit_audio_tracks').value = commaText(item.audio_tracks);
+  document.getElementById('edit_subtitles').value = commaText(item.subtitles);
+  document.getElementById('last-scanned-panel').classList.remove('hidden');
+}
+
 async function loadItems() {
   const res = await fetch('/items');
   const items = await res.json();
@@ -52,11 +182,17 @@ async function loadItems() {
 
   container.innerHTML = items.map(item => `
     <div class="item">
-      <strong>${item.title}</strong> (${item.year || 'unknown'})
+      <strong>${escapeHtml(item.title)}</strong> (${escapeHtml(item.year || 'unknown')})
       <br>
-      ${item.media_type} — ${item.original_location || 'no location'}
+      ${escapeHtml(item.media_type)} — ${escapeHtml(item.original_location || 'no location')}
       <br>
-      Barcode: ${item.barcode || 'none'}
+      Barcode: ${escapeHtml(item.barcode || 'none')}
+      <div class="metadata">
+        ${escapeHtml(compactParts(item).join(' · '))}
+        ${listLine('HDR', item.hdr)}
+        ${listLine('Audio', item.audio_tracks)}
+        ${listLine('Subtitles', item.subtitles)}
+      </div>
     </div>
   `).join('');
 }
@@ -86,6 +222,7 @@ async function lookupBarcode() {
   }
 
   status.textContent = `Added: ${data.item.title}`;
+  fillLastScannedPanel(data.item);
 
   barcodeInput.value = '';
   document.getElementById('title').value = '';
@@ -93,6 +230,51 @@ async function lookupBarcode() {
 
   await loadItems();
   barcodeInput.focus();
+}
+
+async function saveLastScannedItem() {
+  if (!lastScannedItemId) {
+    return;
+  }
+
+  const title = document.getElementById('edit_title').value.trim();
+  if (!title) {
+    document.getElementById('status').textContent = 'Title is required.';
+    return;
+  }
+
+  const payload = {
+    title: title,
+    year: optionalNumber('edit_year'),
+    media_type: document.getElementById('edit_media_type').value,
+    original_location: optionalText('edit_original_location'),
+    resolution: optionalText('edit_resolution'),
+    video_codec: optionalText('edit_video_codec'),
+    aspect_ratio: optionalText('edit_aspect_ratio'),
+    original_aspect_ratio: optionalText('edit_original_aspect_ratio'),
+    region: optionalText('edit_region'),
+    runtime: optionalNumber('edit_runtime'),
+    discs: optionalNumber('edit_discs'),
+    hdr: commaArray(document.getElementById('edit_hdr').value),
+    audio_tracks: commaArray(document.getElementById('edit_audio_tracks').value),
+    subtitles: commaArray(document.getElementById('edit_subtitles').value)
+  };
+
+  const res = await fetch(`/items/${lastScannedItemId}`, {
+    method: 'PATCH',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    document.getElementById('status').textContent = 'Could not save item.';
+    return;
+  }
+
+  const savedItem = await res.json();
+  fillLastScannedPanel(savedItem);
+  document.getElementById('status').textContent = 'Item updated.';
+  await loadItems();
 }
 
 async function addItem() {
