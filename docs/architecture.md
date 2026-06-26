@@ -1,156 +1,121 @@
-# Architecture
+# Avatra Architecture
 
-## Overview
+Avatra is the physical media layer for Kodi.
 
-Avatra is split into four logical layers:
+Kodi remains responsible for the movie experience: posters, fanart, synopsis, actors, collections, browsing and playback UI.
 
-1. Backend API
-2. Data persistence
-3. Web frontend
-4. External integrations
+Avatra is responsible for the physical reality of the collection: disc ownership, edition identification, storage location, availability, technical disc metadata and automation.
 
-The backend is the source of truth for Avatra-specific state.
+---
 
-Kodi remains the source of truth for media-center metadata.
+## Core Principle
 
-Home Assistant is used for hosting, access, and automation orchestration, but it
-must not contain core Avatra business logic.
+Kodi knows the movie.
 
-## Backend
+Avatra knows the disc.
 
-Technology:
+---
 
-- FastAPI
-- SQLModel
-- SQLite
-- Uvicorn
-
-Responsibilities:
-
-- expose REST API;
-- validate domain operations;
-- store inventory state;
-- manage physical locations;
-- manage loans;
-- manage barcode identification state;
-- expose integration endpoints.
-
-The backend should contain clear boundaries:
+## High-Level Architecture
 
 ```text
-app/
-├── main.py
-├── models/
-├── schemas/
-├── routes/
-├── services/
-├── repositories/
-└── settings.py
-```
+                Kodi
+                 ▲
+                 │
+          Kodi Avatra Add-on
+                 ▲
+                 │
+              REST API
+                 ▲
+                 │
+┌────────────────────────────────────┐
+│              Avatra                │
+├────────────────────────────────────┤
+│ Recognition Engine                 │
+│ Collection Manager                 │
+│ Shelf Map                          │
+│ Kodi Exporter                      │
+│ Automation Bridge                  │
+└────────────────────────────────────┘
+       ▲                       ▲
+       │                       │
+Metadata Providers        Home Assistant
+DVDfr, Blu-ray.com...     ESPHome, LEDs, AVR...
 
-If the current code is simpler, evolve gradually.
+Puis :
 
-## Database
+```bash
+git add .gitignore docs/architecture.md
+git commit -m "docs: add architecture overview"
+git push
+cat > app/lookup/cede.py <<'EOF'
+import re
+from urllib.parse import quote_plus
 
-SQLite is the default database.
+import httpx
+from bs4 import BeautifulSoup
 
-This is intentional:
+from app.lookup.providers import SearchResult
 
-- easy backup;
-- easy Home Assistant add-on deployment;
-- simple local development;
-- sufficient for a home media collection.
 
-Do not introduce PostgreSQL/MySQL as a requirement.
+def clean_title(title: str) -> str:
+    title = re.sub(r"\s+", " ", title or "").strip()
+    title = re.sub(r"\s*[-|].*$", "", title).strip()
+    return title
 
-Future support for another DB may exist, but SQLite must remain first-class.
 
-## Frontend
+def extract_year(text: str) -> int | None:
+    match = re.search(r"\b(19|20)\d{2}\b", text or "")
+    return int(match.group(0)) if match else None
 
-The frontend is a practical tool, not a complex SPA.
 
-It should be:
+def media_type_from_text(text: str) -> str | None:
+    text = (text or "").lower()
+    if "4k" in text or "uhd" in text or "ultra hd" in text:
+        return "uhd"
+    if "blu-ray" in text or "bluray" in text:
+        return "bluray"
+    if "dvd" in text:
+        return "dvd"
+    return None
 
-- mobile friendly;
-- fast;
-- readable;
-- usable on a phone while standing near shelves;
-- usable through Home Assistant ingress later.
 
-Avoid heavy frameworks unless explicitly requested.
+async def search_cede(barcode: str) -> list[SearchResult]:
+    url = f"https://www.cede.ch/en/search/?q={quote_plus(barcode)}"
 
-## Kodi add-on
+    async with httpx.AsyncClient(timeout=10, follow_redirects=True) as client:
+        response = await client.get(
+            url,
+            headers={"User-Agent": "Mozilla/5.0 Avatra/0.1"},
+        )
 
-Kodi integration should make physical items appear naturally in Kodi workflows.
+    if response.status_code != 200:
+        return []
 
-Expected behavior:
+    response.encoding = "utf-8"
+    soup = BeautifulSoup(response.text, "html.parser")
+    page_text = soup.get_text(" ", strip=True)
 
-- browsing in Kodi should expose physical titles;
-- launching a physical item should prompt the user to insert the disc;
-- later, Avatra can trigger automation to open the correct tray and switch AVR input.
+    if barcode not in page_text:
+        return []
 
-Kodi must not become the inventory database.
+    html_title = soup.title.get_text(" ", strip=True) if soup.title else ""
+    title = clean_title(html_title)
 
-## Home Assistant add-on
+    if not title:
+        h1 = soup.find("h1")
+        title = clean_title(h1.get_text(" ", strip=True)) if h1 else ""
 
-Home Assistant integration is for:
+    if not title:
+        return []
 
-- easy hosting;
-- remote access;
-- automation triggers;
-- dashboards;
-- notifications.
-
-Home Assistant must not become the main storage model.
-
-## Integration philosophy
-
-Avatra should expose clean APIs and webhooks so other systems can integrate.
-
-Do not hardcode the user's exact devices into core code.
-
-Device-specific logic should live in configuration or integration adapters.
-
-## Data flow examples
-
-### Add a disc
-
-1. User scans barcode.
-2. Backend receives barcode.
-3. Backend searches identification sources.
-4. Backend proposes candidate edition.
-5. User confirms or edits minimal fields.
-6. Backend stores physical edition and location.
-
-### Loan a disc
-
-1. User selects/scans item.
-2. User chooses borrower.
-3. Backend creates loan record.
-4. Item status changes to `on_loan`.
-5. Original location is preserved.
-
-### Return a disc
-
-1. User scans or selects item.
-2. Backend closes active loan.
-3. Item status returns to `in_stock`.
-4. User is reminded of original location.
-
-### Launch a physical movie
-
-1. User selects title in Kodi or Avatra.
-2. Avatra checks availability.
-3. Avatra asks user to insert disc.
-4. Future automation can open tray and switch inputs.
-
-## Non-goals
-
-Avatra is not:
-
-- a Plex replacement;
-- a Kodi metadata scraper;
-- a cloud catalog service;
-- a social network;
-- a commercial rental system;
-- a DRM/copying tool.
+    return [
+        SearchResult(
+            source="CeDe",
+            title=title,
+            url=str(response.url),
+            score=7,
+            year=extract_year(page_text),
+            media_type=media_type_from_text(page_text),
+        )
+    ]
