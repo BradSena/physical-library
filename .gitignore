@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual env
+.venv/
+
+# SQLite local databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# macOS
+.DS_Store
+
+# VS Code local settings
+.vscode/
+
+# Caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Logs
+*.log
+
+# Temporary patches
+*.patch
