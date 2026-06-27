@@ -5,98 +5,713 @@
   <title>Avatra</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; }
-    input, select, button { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; }
-    button { cursor: pointer; }
-    .item { border: 1px solid #ddd; padding: 12px; margin-top: 10px; border-radius: 8px; }
-    .metadata { color: #555; font-size: 14px; line-height: 1.5; margin-top: 6px; }
-    .status { padding: 10px; margin: 10px 0; border-radius: 8px; background: #f4f4f4; }
-    .edit-panel { border: 1px solid #ddd; padding: 12px; margin: 16px 0; border-radius: 8px; background: #fafafa; }
-    .edit-grid { display: grid; gap: 8px; }
-    .edit-grid label { font-size: 14px; font-weight: 600; }
-    .edit-grid input, .edit-grid select { margin-top: 4px; }
-    .hidden { display: none; }
+    :root {
+      color-scheme: dark;
+      --bg: #070a10;
+      --bg-soft: #0b111b;
+      --panel: rgba(16, 24, 38, 0.86);
+      --panel-strong: rgba(20, 31, 49, 0.96);
+      --line: rgba(142, 166, 199, 0.18);
+      --line-strong: rgba(48, 213, 255, 0.32);
+      --text: #edf6ff;
+      --muted: #a7b5c8;
+      --faint: #75869c;
+      --accent: #30d5ff;
+      --accent-soft: rgba(48, 213, 255, 0.12);
+      --accent-hot: #7ce8ff;
+      --green: #7cffc4;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(48, 213, 255, 0.18), transparent 26rem),
+        radial-gradient(circle at 86% 18%, rgba(67, 97, 238, 0.16), transparent 28rem),
+        linear-gradient(145deg, #080b12 0%, #0b1020 48%, #05070c 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .app-frame {
+      position: relative;
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 22px;
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .sidebar {
+      min-height: calc(100vh - 44px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(13, 20, 32, 0.96), rgba(8, 12, 20, 0.92));
+      box-shadow: var(--shadow);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand-mark {
+      display: grid;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background:
+        radial-gradient(circle, transparent 0 28%, rgba(48, 213, 255, 0.9) 29% 34%, transparent 35%),
+        linear-gradient(135deg, #1b79ff, #31ddff);
+      color: #06101a;
+      font-weight: 950;
+      box-shadow: 0 0 30px rgba(48, 213, 255, 0.26);
+    }
+
+    .brand-title {
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .tagline,
+    .sidebar-copy,
+    .footer {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 26px;
+    }
+
+    .nav-pill {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      font-weight: 750;
+    }
+
+    .nav-pill.active {
+      color: var(--accent-hot);
+      border-color: var(--line-strong);
+      background: var(--accent-soft);
+    }
+
+    .footer {
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .content {
+      display: grid;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      min-height: 94px;
+    }
+
+    .hero h2 {
+      font-size: clamp(30px, 5vw, 56px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 680px;
+    }
+
+    .status-chip {
+      flex: 0 0 auto;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--accent-hot);
+      background: var(--accent-soft);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 1.25fr) minmax(280px, 0.75fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, var(--panel-strong), rgba(10, 15, 25, 0.94));
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .scan-card {
+      min-height: 330px;
+      display: grid;
+      align-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .scan-card::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -70px;
+      bottom: -70px;
+      border-radius: 50%;
+      border: 34px solid rgba(48, 213, 255, 0.08);
+      box-shadow: inset 0 0 0 2px rgba(48, 213, 255, 0.18);
+    }
+
+    .panel-head {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .panel h3 {
+      margin-top: 3px;
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+
+    .panel-note {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .form-grid,
+    .edit-grid {
+      display: grid;
+      gap: 11px;
+      position: relative;
+    }
+
+    .edit-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    input,
+    select {
+      border: 1px solid rgba(142, 166, 199, 0.24);
+      background: rgba(4, 8, 14, 0.78);
+      color: var(--text);
+      padding: 12px;
+      outline: none;
+    }
+
+    input::placeholder {
+      color: #65758a;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(48, 213, 255, 0.14);
+    }
+
+    button {
+      border: 0;
+      background: linear-gradient(135deg, #1a9cff, #31dcff);
+      color: #03111b;
+      cursor: pointer;
+      font-weight: 950;
+      padding: 12px 14px;
+      box-shadow: 0 12px 28px rgba(48, 213, 255, 0.18);
+    }
+
+    button:hover {
+      filter: brightness(1.06);
+    }
+
+    .secondary-button {
+      margin-top: 12px;
+    }
+
+    .status {
+      position: relative;
+      margin-top: 14px;
+      border: 1px solid var(--line-strong);
+      background: rgba(48, 213, 255, 0.08);
+      color: #dff8ff;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .collection-panel {
+      padding: 18px;
+    }
+
+    .collection-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .collection-head h3 {
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    #items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      border: 1px dashed rgba(142, 166, 199, 0.28);
+      border-radius: 8px;
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .disc-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 94px minmax(0, 1fr);
+      gap: 14px;
+      min-height: 186px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(160deg, rgba(20, 30, 48, 0.98), rgba(9, 14, 23, 0.98));
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.26);
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .disc-card::after {
+      content: "...";
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      color: var(--faint);
+      letter-spacing: 2px;
+      font-weight: 900;
+    }
+
+    .cover {
+      position: relative;
+      min-height: 142px;
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 58%, transparent 0 16%, rgba(48, 213, 255, 0.52) 17% 19%, transparent 20%),
+        radial-gradient(circle at 50% 58%, rgba(255, 255, 255, 0.1), transparent 34%),
+        linear-gradient(145deg, #101827, #050912 58%, #11243a);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 0 40px rgba(48, 213, 255, 0.1);
+    }
+
+    .cover::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 50%;
+      border: 10px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        inset 0 0 0 1px rgba(48, 213, 255, 0.24),
+        0 0 26px rgba(48, 213, 255, 0.12);
+    }
+
+    .cover::after {
+      content: "AV";
+      position: absolute;
+      left: 50%;
+      top: 58%;
+      transform: translate(-50%, -50%);
+      color: rgba(237, 246, 255, 0.34);
+      font-weight: 950;
+      font-size: 18px;
+    }
+
+    .cover-ribbon {
+      position: absolute;
+      top: 11px;
+      left: -31px;
+      width: 118px;
+      transform: rotate(-38deg);
+      background: linear-gradient(135deg, #1a9cff, #31dcff);
+      color: #03111b;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 950;
+      padding: 4px 0;
+      text-transform: uppercase;
+    }
+
+    .disc-info {
+      min-width: 0;
+      display: grid;
+      align-content: start;
+      gap: 9px;
+      padding-right: 18px;
+    }
+
+    .disc-title {
+      font-size: 17px;
+      line-height: 1.22;
+      font-weight: 950;
+      overflow-wrap: anywhere;
+    }
+
+    .disc-subtitle,
+    .barcode,
+    .meta-line {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .barcode {
+      color: var(--faint);
+      overflow-wrap: anywhere;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      max-width: 100%;
+      border: 1px solid rgba(142, 166, 199, 0.22);
+      border-radius: 999px;
+      background: rgba(142, 166, 199, 0.1);
+      color: #dce9f7;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .badge.media {
+      border-color: var(--line-strong);
+      background: var(--accent-soft);
+      color: var(--accent-hot);
+    }
+
+    .badge.hdr {
+      border-color: rgba(124, 255, 196, 0.3);
+      background: rgba(124, 255, 196, 0.09);
+      color: var(--green);
+    }
+
+    .badge.audio {
+      border-color: rgba(120, 157, 255, 0.3);
+      background: rgba(120, 157, 255, 0.1);
+    }
+
+    .meta-lines {
+      display: grid;
+      gap: 3px;
+    }
+
+    @media (max-width: 1060px) {
+      .app-frame {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+      }
+
+      .nav-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 780px) {
+      .app-frame {
+        padding: 14px;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .collection-head {
+        display: grid;
+      }
+
+      .status-chip {
+        justify-self: start;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .sidebar,
+      .panel,
+      .collection-panel {
+        padding: 14px;
+      }
+
+      .nav-list {
+        grid-template-columns: 1fr;
+      }
+
+      .edit-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #items {
+        grid-template-columns: 1fr;
+      }
+
+      .disc-card {
+        grid-template-columns: 82px minmax(0, 1fr);
+      }
+
+      .cover {
+        min-height: 128px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Avatra</h1>
-  <p>Digital avatars for your physical media.</p>
+  <div class="app-frame">
+    <aside class="sidebar">
+      <div>
+        <div class="brand-mark">
+          <div class="logo">A</div>
+          <div>
+            <h1 class="brand-title">Avatra</h1>
+            <p class="tagline">Digital avatars for your physical media.</p>
+          </div>
+        </div>
 
-  <h2>Scan or enter barcode</h2>
+        <nav class="nav-list" aria-label="Dashboard sections">
+          <div class="nav-pill active">Scan</div>
+          <div class="nav-pill">Collection</div>
+          <div class="nav-pill">Metadata</div>
+        </nav>
+      </div>
 
-  <input id="barcode" placeholder="Barcode" autofocus>
-  <button onclick="lookupBarcode()">Lookup</button>
+      <div class="footer">Kodi knows the movie. Avatra knows the disc.</div>
+    </aside>
 
-  <div id="status" class="status">Waiting for barcode.</div>
+    <main class="content">
+      <section class="hero">
+        <div>
+          <h2>Physical media command shelf</h2>
+          <p>Scan, confirm, and keep the edition details that matter when the case is in your hand.</p>
+        </div>
+        <div class="status-chip">Local SQLite library</div>
+      </section>
 
-  <div id="last-scanned-panel" class="edit-panel hidden">
-    <h2>Edit last scanned item</h2>
-    <div class="edit-grid">
-      <label>Title
-        <input id="edit_title">
-      </label>
-      <label>Year
-        <input id="edit_year" type="number">
-      </label>
-      <label>Media type
-        <select id="edit_media_type">
-          <option value="bluray">Blu-ray</option>
-          <option value="uhd">UHD Blu-ray</option>
-          <option value="dvd">DVD</option>
-        </select>
-      </label>
-      <label>Original location
-        <input id="edit_original_location">
-      </label>
-      <label>Resolution
-        <input id="edit_resolution">
-      </label>
-      <label>Video codec
-        <input id="edit_video_codec">
-      </label>
-      <label>Aspect ratio
-        <input id="edit_aspect_ratio">
-      </label>
-      <label>Original aspect ratio
-        <input id="edit_original_aspect_ratio">
-      </label>
-      <label>Region
-        <input id="edit_region">
-      </label>
-      <label>Runtime
-        <input id="edit_runtime" type="number">
-      </label>
-      <label>Discs
-        <input id="edit_discs" type="number">
-      </label>
-      <label>HDR
-        <input id="edit_hdr">
-      </label>
-      <label>Audio tracks
-        <input id="edit_audio_tracks">
-      </label>
-      <label>Subtitles
-        <input id="edit_subtitles">
-      </label>
-    </div>
-    <button onclick="saveLastScannedItem()">Save</button>
+      <section class="dashboard-grid">
+        <div class="panel scan-card">
+          <div>
+            <div class="panel-head">
+              <div>
+                <div class="kicker">Priority workflow</div>
+                <h3>Scan a barcode</h3>
+                <p class="panel-note">Add a disc and open the last scanned editor in one pass.</p>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <input id="barcode" placeholder="Barcode" autofocus>
+              <button onclick="lookupBarcode()">Lookup</button>
+            </div>
+          </div>
+
+          <div id="status" class="status">Waiting for barcode.</div>
+        </div>
+
+        <div class="side-stack">
+          <div id="last-scanned-panel" class="panel hidden">
+            <div class="panel-head">
+              <div>
+                <div class="kicker">Latest scan</div>
+                <h3>Edit last scanned item</h3>
+                <p class="panel-note">Comma-separate HDR, audio tracks, and subtitles.</p>
+              </div>
+            </div>
+
+            <div class="edit-grid">
+              <label>Title
+                <input id="edit_title">
+              </label>
+              <label>Year
+                <input id="edit_year" type="number">
+              </label>
+              <label>Media type
+                <select id="edit_media_type">
+                  <option value="bluray">Blu-ray</option>
+                  <option value="uhd">UHD Blu-ray</option>
+                  <option value="dvd">DVD</option>
+                </select>
+              </label>
+              <label>Original location
+                <input id="edit_original_location">
+              </label>
+              <label>Resolution
+                <input id="edit_resolution">
+              </label>
+              <label>Video codec
+                <input id="edit_video_codec">
+              </label>
+              <label>Aspect ratio
+                <input id="edit_aspect_ratio">
+              </label>
+              <label>Original aspect ratio
+                <input id="edit_original_aspect_ratio">
+              </label>
+              <label>Region
+                <input id="edit_region">
+              </label>
+              <label>Runtime
+                <input id="edit_runtime" type="number">
+              </label>
+              <label>Discs
+                <input id="edit_discs" type="number">
+              </label>
+              <label>HDR
+                <input id="edit_hdr">
+              </label>
+              <label>Audio tracks
+                <input id="edit_audio_tracks">
+              </label>
+              <label>Subtitles
+                <input id="edit_subtitles">
+              </label>
+            </div>
+
+            <button class="secondary-button" onclick="saveLastScannedItem()">Save</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="kicker">Fallback</div>
+                <h3>Add a disc manually</h3>
+                <p class="panel-note">Use this when barcode recognition needs a hand.</p>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <input id="title" placeholder="Title">
+              <input id="year" placeholder="Year">
+              <select id="media_type">
+                <option value="bluray">Blu-ray</option>
+                <option value="uhd">UHD Blu-ray</option>
+                <option value="dvd">DVD</option>
+              </select>
+              <input id="original_location" placeholder="Storage zone, e.g. A2">
+              <button onclick="addItem()">Add disc</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel collection-panel">
+        <div class="collection-head">
+          <div>
+            <div class="kicker">Collection</div>
+            <h3>Disc shelf</h3>
+            <p class="panel-note">Each card is a physical edition, with technical metadata kept close.</p>
+          </div>
+        </div>
+        <div id="items"></div>
+      </section>
+    </main>
   </div>
-
-  <h2>Add a disc</h2>
-
-  <input id="title" placeholder="Title">
-  <input id="year" placeholder="Year">
-  <select id="media_type">
-    <option value="bluray">Blu-ray</option>
-    <option value="uhd">UHD Blu-ray</option>
-    <option value="dvd">DVD</option>
-  </select>
-  <input id="original_location" placeholder="Storage zone, e.g. A2">
-
-  <button onclick="addItem()">Add disc</button>
-
-  <h2>Collection</h2>
-  <div id="items"></div>
 
 <script>
 let lastScannedItemId = null;
@@ -110,24 +725,49 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-function compactParts(item) {
-  return [
-    item.media_type,
-    item.resolution,
-    item.video_codec,
-    item.aspect_ratio ? `AR ${item.aspect_ratio}` : null,
-    item.original_aspect_ratio ? `Original AR ${item.original_aspect_ratio}` : null,
-    item.region ? `Region ${item.region}` : null,
-    item.runtime ? `${item.runtime} min` : null,
-    item.discs ? `${item.discs} disc${item.discs === 1 ? '' : 's'}` : null
-  ].filter(Boolean);
+function mediaLabel(value) {
+  const labels = {
+    dvd: 'DVD',
+    bluray: 'Blu-ray',
+    uhd: 'UHD'
+  };
+  return labels[value] || null;
 }
 
-function listLine(label, values) {
-  if (!Array.isArray(values) || values.length === 0) {
+function badge(value, className = '') {
+  if (!value) {
     return '';
   }
-  return `<br>${label}: ${escapeHtml(values.join(', '))}`;
+  return `<span class="badge ${className}">${escapeHtml(value)}</span>`;
+}
+
+function badgeList(values, className = '') {
+  if (!Array.isArray(values)) {
+    return '';
+  }
+  return values.map(value => badge(value, className)).join('');
+}
+
+function compactBadges(item) {
+  return [
+    badge(mediaLabel(item.media_type), 'media'),
+    badge(item.resolution),
+    badge(item.video_codec),
+    badgeList(item.hdr, 'hdr'),
+    badgeList(item.audio_tracks, 'audio'),
+    badge(item.region ? `Region ${item.region}` : null),
+    badge(item.runtime ? `${item.runtime} min` : null),
+    badge(item.discs ? `${item.discs} disc${item.discs === 1 ? '' : 's'}` : null)
+  ].join('');
+}
+
+function detailLines(item) {
+  return [
+    item.aspect_ratio ? `Aspect ratio: ${item.aspect_ratio}` : null,
+    item.original_aspect_ratio ? `Original aspect ratio: ${item.original_aspect_ratio}` : null,
+    Array.isArray(item.spoken_languages) && item.spoken_languages.length > 0 ? `Languages: ${item.spoken_languages.join(', ')}` : null,
+    Array.isArray(item.subtitles) && item.subtitles.length > 0 ? `Subtitles: ${item.subtitles.join(', ')}` : null
+  ].filter(Boolean);
 }
 
 function commaText(values) {
@@ -176,25 +816,35 @@ async function loadItems() {
   const container = document.getElementById('items');
 
   if (items.length === 0) {
-    container.innerHTML = '<p>No discs yet.</p>';
+    container.innerHTML = '<div class="empty-state">No discs yet.</div>';
     return;
   }
 
-  container.innerHTML = items.map(item => `
-    <div class="item">
-      <strong>${escapeHtml(item.title)}</strong> (${escapeHtml(item.year || 'unknown')})
-      <br>
-      ${escapeHtml(item.media_type)} — ${escapeHtml(item.original_location || 'no location')}
-      <br>
-      Barcode: ${escapeHtml(item.barcode || 'none')}
-      <div class="metadata">
-        ${escapeHtml(compactParts(item).join(' · '))}
-        ${listLine('HDR', item.hdr)}
-        ${listLine('Audio', item.audio_tracks)}
-        ${listLine('Subtitles', item.subtitles)}
-      </div>
-    </div>
-  `).join('');
+  container.innerHTML = items.map(item => {
+    const lines = detailLines(item);
+    const media = mediaLabel(item.media_type);
+    const year = item.year ? `<span>${escapeHtml(item.year)}</span>` : '';
+    const location = item.original_location ? `<span>${escapeHtml(item.original_location)}</span>` : '';
+    const subtitle = [year, location].filter(Boolean).join(' / ');
+    return `
+      <article class="disc-card">
+        <div class="cover">
+          ${media ? `<div class="cover-ribbon">${escapeHtml(media)}</div>` : ''}
+        </div>
+        <div class="disc-info">
+          <div>
+            <div class="disc-title">${escapeHtml(item.title)}</div>
+            ${subtitle ? `<div class="disc-subtitle">${subtitle}</div>` : ''}
+          </div>
+          ${item.barcode ? `<div class="barcode">Barcode: ${escapeHtml(item.barcode)}</div>` : ''}
+          <div class="badge-row">${compactBadges(item)}</div>
+          <div class="meta-lines">
+            ${lines.map(line => `<div class="meta-line">${escapeHtml(line)}</div>`).join('')}
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
 }
 
 async function lookupBarcode() {
