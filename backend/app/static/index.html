@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="utf-8">
   <title>Avatra</title>
@@ -7,20 +7,24 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #070a10;
-      --bg-soft: #0b111b;
-      --panel: rgba(16, 24, 38, 0.86);
-      --panel-strong: rgba(20, 31, 49, 0.96);
-      --line: rgba(142, 166, 199, 0.18);
-      --line-strong: rgba(48, 213, 255, 0.32);
-      --text: #edf6ff;
-      --muted: #a7b5c8;
-      --faint: #75869c;
-      --accent: #30d5ff;
-      --accent-soft: rgba(48, 213, 255, 0.12);
-      --accent-hot: #7ce8ff;
-      --green: #7cffc4;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+      --bg: #0f1117;
+      --bg-2: #111827;
+      --card: #171f2c;
+      --card-2: #1b2534;
+      --line: rgba(148, 163, 184, 0.16);
+      --line-strong: rgba(45, 183, 255, 0.34);
+      --text: #f3f7fb;
+      --muted: #9aa8ba;
+      --faint: #6f7f93;
+      --accent: #2db7ff;
+      --accent-soft: rgba(45, 183, 255, 0.12);
+      --purple: #9b7cff;
+      --purple-soft: rgba(155, 124, 255, 0.13);
+      --green: #4ade80;
+      --green-soft: rgba(74, 222, 128, 0.12);
+      --orange: #f59e0b;
+      --orange-soft: rgba(245, 158, 11, 0.12);
+      --shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
     }
 
     * {
@@ -32,11 +36,11 @@
       margin: 0;
       color: var(--text);
       background:
-        radial-gradient(circle at 18% 8%, rgba(48, 213, 255, 0.18), transparent 26rem),
-        radial-gradient(circle at 86% 18%, rgba(67, 97, 238, 0.16), transparent 28rem),
-        linear-gradient(145deg, #080b12 0%, #0b1020 48%, #05070c 100%);
+        radial-gradient(circle at 30% 0%, rgba(45, 183, 255, 0.12), transparent 32rem),
+        radial-gradient(circle at 100% 15%, rgba(155, 124, 255, 0.10), transparent 26rem),
+        linear-gradient(135deg, var(--bg), var(--bg-2) 58%, #0b0f16);
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     body::before {
@@ -47,8 +51,9 @@
       background-image:
         linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: linear-gradient(to bottom, black, transparent 82%);
+      background-size: 42px 42px;
+      opacity: 0.45;
+      mask-image: linear-gradient(to bottom, black, transparent 76%);
     }
 
     h1,
@@ -58,32 +63,49 @@
       margin: 0;
     }
 
-    .app-frame {
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app-shell {
       position: relative;
       display: grid;
-      grid-template-columns: 250px minmax(0, 1fr);
-      gap: 22px;
-      width: min(1440px, 100%);
+      grid-template-columns: 256px minmax(0, 1fr);
+      min-height: 100vh;
+      width: min(1500px, 100%);
       margin: 0 auto;
-      padding: 22px;
+      padding: 18px;
+      gap: 18px;
     }
 
     .sidebar {
-      min-height: calc(100vh - 44px);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: linear-gradient(180deg, rgba(13, 20, 32, 0.96), rgba(8, 12, 20, 0.92));
-      box-shadow: var(--shadow);
-      padding: 20px;
+      position: sticky;
+      top: 18px;
+      align-self: start;
+      min-height: calc(100vh - 36px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 24px;
+      gap: 28px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(15, 21, 31, 0.86);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      backdrop-filter: blur(18px);
     }
 
-    .brand-mark {
+    .brand {
       display: grid;
-      gap: 10px;
+      gap: 14px;
+    }
+
+    .brand-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
     }
 
     .logo {
@@ -91,165 +113,221 @@
       height: 44px;
       display: grid;
       place-items: center;
-      border-radius: 8px;
+      border-radius: 14px;
       background:
-        radial-gradient(circle, transparent 0 28%, rgba(48, 213, 255, 0.9) 29% 34%, transparent 35%),
-        linear-gradient(135deg, #1b79ff, #31ddff);
-      color: #06101a;
+        radial-gradient(circle, transparent 0 30%, rgba(15, 17, 23, 0.7) 31% 38%, transparent 39%),
+        linear-gradient(145deg, #2db7ff, #8ee8ff);
+      color: #071019;
       font-weight: 950;
-      box-shadow: 0 0 30px rgba(48, 213, 255, 0.26);
+      box-shadow: 0 0 24px rgba(45, 183, 255, 0.18);
     }
 
     .brand-title {
-      font-size: 30px;
-      line-height: 1;
+      font-size: 25px;
+      font-weight: 900;
       letter-spacing: 0;
     }
 
-    .tagline,
-    .sidebar-copy,
-    .footer {
+    .tagline {
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .nav-list {
       display: grid;
-      gap: 8px;
-      margin-top: 26px;
+      gap: 7px;
+      margin-top: 24px;
     }
 
-    .nav-pill {
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
       border: 1px solid transparent;
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-radius: 12px;
+      padding: 9px 11px;
       color: var(--muted);
-      background: rgba(255, 255, 255, 0.03);
-      font-weight: 750;
+      background: rgba(255, 255, 255, 0.025);
+      font-weight: 720;
+      cursor: pointer;
     }
 
-    .nav-pill.active {
-      color: var(--accent-hot);
+    .nav-item::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(154, 168, 186, 0.45);
+    }
+
+    .nav-item.active {
+      color: var(--text);
       border-color: var(--line-strong);
       background: var(--accent-soft);
     }
 
-    .footer {
-      border-top: 1px solid var(--line);
-      padding-top: 16px;
+    .nav-item.active::before {
+      background: var(--accent);
+      box-shadow: 0 0 16px rgba(45, 183, 255, 0.55);
     }
 
-    .content {
-      display: grid;
-      gap: 20px;
+    .api-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.035);
+      padding: 13px;
+    }
+
+    .api-card strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .api-card span {
+      display: block;
+      margin-top: 3px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .main {
       min-width: 0;
-    }
-
-    .hero {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
+      display: grid;
       gap: 18px;
-      min-height: 94px;
     }
 
-    .hero h2 {
-      font-size: clamp(30px, 5vw, 56px);
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 440px);
+      gap: 18px;
+      align-items: end;
+      min-height: 92px;
+    }
+
+    .page-title {
+      font-size: clamp(32px, 5vw, 52px);
       line-height: 1;
       letter-spacing: 0;
+      font-weight: 920;
     }
 
-    .hero p {
+    .page-subtitle {
       margin-top: 8px;
       color: var(--muted);
-      max-width: 680px;
+      font-size: 16px;
     }
 
-    .status-chip {
-      flex: 0 0 auto;
-      border: 1px solid var(--line-strong);
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap::before {
+      content: "";
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--muted);
+      border-radius: 50%;
+      transform: translateY(-50%);
+    }
+
+    .search-wrap::after {
+      content: "";
+      position: absolute;
+      left: 27px;
+      top: 58%;
+      width: 8px;
+      height: 2px;
       border-radius: 999px;
-      padding: 8px 12px;
-      color: var(--accent-hot);
-      background: var(--accent-soft);
-      font-size: 13px;
-      font-weight: 800;
+      background: var(--muted);
+      transform: rotate(45deg);
     }
 
-    .dashboard-grid {
+    #search {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(23, 31, 44, 0.88);
+      color: var(--text);
+      outline: none;
+      padding: 12px 14px 12px 48px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .workflow {
       display: grid;
-      grid-template-columns: minmax(300px, 1.25fr) minmax(280px, 0.75fr);
+      grid-template-columns: minmax(320px, 1.25fr) minmax(300px, 0.75fr);
       gap: 18px;
       align-items: start;
     }
 
-    .side-stack {
-      display: grid;
-      gap: 18px;
-    }
-
-    .panel {
+    .card {
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: linear-gradient(180deg, var(--panel-strong), rgba(10, 15, 25, 0.94));
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(23, 31, 44, 0.94), rgba(17, 24, 35, 0.96));
       box-shadow: var(--shadow);
       padding: 18px;
     }
 
     .scan-card {
-      min-height: 330px;
+      min-height: 300px;
+      position: relative;
+      overflow: hidden;
       display: grid;
       align-content: space-between;
-      overflow: hidden;
-      position: relative;
     }
 
     .scan-card::after {
       content: "";
       position: absolute;
-      width: 220px;
-      height: 220px;
-      right: -70px;
-      bottom: -70px;
+      right: -78px;
+      bottom: -92px;
+      width: 260px;
+      height: 260px;
       border-radius: 50%;
-      border: 34px solid rgba(48, 213, 255, 0.08);
-      box-shadow: inset 0 0 0 2px rgba(48, 213, 255, 0.18);
+      border: 38px solid rgba(45, 183, 255, 0.06);
+      box-shadow: inset 0 0 0 1px rgba(45, 183, 255, 0.18);
     }
 
-    .panel-head {
+    .card-head {
       position: relative;
       display: flex;
       justify-content: space-between;
-      align-items: start;
       gap: 14px;
+      align-items: start;
       margin-bottom: 16px;
     }
 
     .kicker {
       color: var(--accent);
       font-size: 12px;
-      font-weight: 900;
+      font-weight: 850;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .panel h3 {
-      margin-top: 3px;
+    .card h3 {
+      margin-top: 4px;
       font-size: 21px;
       letter-spacing: 0;
     }
 
-    .panel-note {
+    .card-note {
+      margin-top: 6px;
       color: var(--muted);
       font-size: 14px;
-      margin-top: 6px;
     }
 
     .form-grid,
     .edit-grid {
+      position: relative;
       display: grid;
       gap: 11px;
-      position: relative;
     }
 
     .edit-grid {
@@ -261,7 +339,7 @@
       gap: 6px;
       color: var(--muted);
       font-size: 12px;
-      font-weight: 850;
+      font-weight: 780;
     }
 
     input,
@@ -269,44 +347,43 @@
     button {
       width: 100%;
       min-height: 46px;
-      border-radius: 8px;
+      border-radius: 12px;
       font: inherit;
     }
 
     input,
     select {
-      border: 1px solid rgba(142, 166, 199, 0.24);
-      background: rgba(4, 8, 14, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(15, 17, 23, 0.82);
       color: var(--text);
-      padding: 12px;
       outline: none;
+      padding: 12px;
     }
 
     input::placeholder {
-      color: #65758a;
+      color: #657287;
     }
 
     input:focus,
     select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(48, 213, 255, 0.14);
+      box-shadow: 0 0 0 3px rgba(45, 183, 255, 0.12);
     }
 
     button {
       border: 0;
-      background: linear-gradient(135deg, #1a9cff, #31dcff);
-      color: #03111b;
+      background: linear-gradient(135deg, #1898e8, var(--accent));
+      color: #06111b;
       cursor: pointer;
-      font-weight: 950;
+      font-weight: 900;
       padding: 12px 14px;
-      box-shadow: 0 12px 28px rgba(48, 213, 255, 0.18);
     }
 
     button:hover {
-      filter: brightness(1.06);
+      filter: brightness(1.07);
     }
 
-    .secondary-button {
+    .save-button {
       margin-top: 12px;
     }
 
@@ -314,18 +391,92 @@
       position: relative;
       margin-top: 14px;
       border: 1px solid var(--line-strong);
-      background: rgba(48, 213, 255, 0.08);
-      color: #dff8ff;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      color: #dff6ff;
       padding: 12px;
-      border-radius: 8px;
       font-size: 14px;
+    }
+
+    .session-banner {
+      position: relative;
+      margin-top: 10px;
+      border: 1px solid rgba(245, 158, 11, 0.32);
+      border-radius: 12px;
+      background: var(--orange-soft);
+      color: #ffe2a8;
+      padding: 11px 12px;
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    .latest-card {
+      min-height: 300px;
+    }
+
+    .latest-empty {
+      border: 1px dashed rgba(148, 163, 184, 0.22);
+      border-radius: 14px;
+      color: var(--muted);
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .latest-summary {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .latest-title {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .latest-meta {
+      color: var(--muted);
+      font-size: 13px;
     }
 
     .hidden {
       display: none;
     }
 
-    .collection-panel {
+    .manual-row {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(23, 31, 44, 0.82);
+      padding: 14px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 930;
+    }
+
+    .stat-label {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .collection-card {
       padding: 18px;
     }
 
@@ -339,35 +490,33 @@
 
     .collection-head h3 {
       font-size: 24px;
-      letter-spacing: 0;
     }
 
     #items {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 14px;
     }
 
     .empty-state {
       grid-column: 1 / -1;
-      border: 1px dashed rgba(142, 166, 199, 0.28);
-      border-radius: 8px;
-      padding: 28px;
+      border: 1px dashed rgba(148, 163, 184, 0.24);
+      border-radius: 16px;
       color: var(--muted);
       text-align: center;
-      background: rgba(255, 255, 255, 0.03);
+      padding: 28px;
+      background: rgba(255, 255, 255, 0.025);
     }
 
     .disc-card {
       position: relative;
       display: grid;
-      grid-template-columns: 94px minmax(0, 1fr);
-      gap: 14px;
-      min-height: 186px;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 13px;
+      min-height: 168px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: linear-gradient(160deg, rgba(20, 30, 48, 0.98), rgba(9, 14, 23, 0.98));
-      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.26);
+      border-radius: 16px;
+      background: linear-gradient(160deg, rgba(27, 37, 52, 0.96), rgba(17, 24, 35, 0.98));
       padding: 12px;
       overflow: hidden;
     }
@@ -375,7 +524,7 @@
     .disc-card::after {
       content: "...";
       position: absolute;
-      top: 10px;
+      top: 8px;
       right: 12px;
       color: var(--faint);
       letter-spacing: 2px;
@@ -384,66 +533,78 @@
 
     .cover {
       position: relative;
-      min-height: 142px;
-      border-radius: 8px;
+      min-height: 134px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 12px;
       overflow: hidden;
       background:
-        radial-gradient(circle at 50% 58%, transparent 0 16%, rgba(48, 213, 255, 0.52) 17% 19%, transparent 20%),
-        radial-gradient(circle at 50% 58%, rgba(255, 255, 255, 0.1), transparent 34%),
-        linear-gradient(145deg, #101827, #050912 58%, #11243a);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: inset 0 0 40px rgba(48, 213, 255, 0.1);
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 34%),
+        radial-gradient(circle at 50% 58%, rgba(255, 255, 255, 0.10), transparent 0 10%, rgba(45, 183, 255, 0.26) 11% 13%, transparent 14%),
+        linear-gradient(145deg, #202a39, #101722 58%, #0c111a);
     }
 
     .cover::before {
       content: "";
       position: absolute;
-      inset: 18px;
+      left: 50%;
+      top: 58%;
+      width: 54px;
+      height: 54px;
+      border: 8px solid rgba(255, 255, 255, 0.08);
       border-radius: 50%;
-      border: 10px solid rgba(255, 255, 255, 0.08);
-      box-shadow:
-        inset 0 0 0 1px rgba(48, 213, 255, 0.24),
-        0 0 26px rgba(48, 213, 255, 0.12);
+      transform: translate(-50%, -50%);
+      box-shadow: inset 0 0 0 1px rgba(45, 183, 255, 0.16);
     }
 
     .cover::after {
-      content: "AV";
+      content: "";
       position: absolute;
-      left: 50%;
-      top: 58%;
-      transform: translate(-50%, -50%);
-      color: rgba(237, 246, 255, 0.34);
-      font-weight: 950;
-      font-size: 18px;
+      left: 23px;
+      right: 23px;
+      bottom: 20px;
+      height: 14px;
+      border-radius: 12px 12px 4px 4px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 -18px 0 rgba(255, 255, 255, 0.035);
     }
 
     .cover-ribbon {
       position: absolute;
-      top: 11px;
-      left: -31px;
-      width: 118px;
+      top: 10px;
+      left: -30px;
+      width: 116px;
       transform: rotate(-38deg);
-      background: linear-gradient(135deg, #1a9cff, #31dcff);
-      color: #03111b;
+      background: linear-gradient(135deg, #1898e8, var(--accent));
+      color: #06111b;
       text-align: center;
-      font-size: 11px;
+      text-transform: uppercase;
+      font-size: 10px;
       font-weight: 950;
       padding: 4px 0;
-      text-transform: uppercase;
+    }
+
+    .cover-ribbon.dvd {
+      background: linear-gradient(135deg, #22c55e, var(--green));
+    }
+
+    .cover-ribbon.uhd {
+      background: linear-gradient(135deg, #7c3aed, var(--purple));
+      color: #f5f3ff;
     }
 
     .disc-info {
       min-width: 0;
       display: grid;
       align-content: start;
-      gap: 9px;
+      gap: 8px;
       padding-right: 18px;
     }
 
     .disc-title {
-      font-size: 17px;
+      color: var(--text);
+      font-size: 16px;
       line-height: 1.22;
-      font-weight: 950;
+      font-weight: 900;
       overflow-wrap: anywhere;
     }
 
@@ -451,7 +612,7 @@
     .barcode,
     .meta-line {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .barcode {
@@ -468,32 +629,116 @@
     .badge {
       display: inline-flex;
       align-items: center;
-      min-height: 25px;
+      min-height: 24px;
       max-width: 100%;
-      border: 1px solid rgba(142, 166, 199, 0.22);
+      border: 1px solid rgba(148, 163, 184, 0.20);
       border-radius: 999px;
-      background: rgba(142, 166, 199, 0.1);
-      color: #dce9f7;
-      padding: 4px 8px;
+      background: rgba(148, 163, 184, 0.09);
+      color: #dce7f4;
+      padding: 3px 8px;
       font-size: 11px;
-      font-weight: 850;
+      font-weight: 780;
     }
 
     .badge.media {
       border-color: var(--line-strong);
       background: var(--accent-soft);
-      color: var(--accent-hot);
+      color: #9ee7ff;
     }
 
-    .badge.hdr {
-      border-color: rgba(124, 255, 196, 0.3);
-      background: rgba(124, 255, 196, 0.09);
-      color: var(--green);
+    .badge.dvd {
+      border-color: rgba(74, 222, 128, 0.30);
+      background: var(--green-soft);
+      color: #b9fbd0;
+    }
+
+    .badge.uhd,
+    .badge.hdr,
+    .badge.region {
+      border-color: rgba(155, 124, 255, 0.30);
+      background: var(--purple-soft);
+      color: #d7ccff;
+    }
+
+    .badge.location {
+      border-color: rgba(245, 158, 11, 0.30);
+      background: var(--orange-soft);
+      color: #ffd38a;
     }
 
     .badge.audio {
-      border-color: rgba(120, 157, 255, 0.3);
-      background: rgba(120, 157, 255, 0.1);
+      border-color: rgba(45, 183, 255, 0.24);
+      background: rgba(45, 183, 255, 0.08);
+    }
+
+    .stock-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .stock-badge {
+      display: inline-flex;
+      min-height: 24px;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(148, 163, 184, 0.10);
+      color: #dce7f4;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .stock-badge.in_stock {
+      border-color: rgba(74, 222, 128, 0.32);
+      background: var(--green-soft);
+      color: #b9fbd0;
+    }
+
+    .stock-badge.on_loan {
+      border-color: rgba(245, 158, 11, 0.34);
+      background: var(--orange-soft);
+      color: #ffd38a;
+    }
+
+    .stock-badge.on_display {
+      border-color: rgba(45, 183, 255, 0.30);
+      background: var(--accent-soft);
+      color: #9ee7ff;
+    }
+
+    .stock-badge.missing {
+      border-color: rgba(248, 113, 113, 0.34);
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+    }
+
+    .stock-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .stock-button {
+      width: auto;
+      min-height: 30px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      box-shadow: none;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .stock-button:hover {
+      color: var(--text);
+      border-color: var(--line-strong);
+      background: var(--accent-soft);
     }
 
     .meta-lines {
@@ -501,56 +746,183 @@
       gap: 3px;
     }
 
-    @media (max-width: 1060px) {
-      .app-frame {
+    .shelf-workspace {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.45fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .shelf-controls {
+      display: grid;
+      gap: 14px;
+    }
+
+    .shelf-form-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(15, 17, 23, 0.38);
+      padding: 14px;
+    }
+
+    .shelf-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .shelf-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(15, 17, 23, 0.38);
+      padding: 14px;
+    }
+
+    .shelf-card.selected {
+      border-color: var(--line-strong);
+      box-shadow: inset 0 0 0 1px rgba(45, 183, 255, 0.18);
+    }
+
+    .shelf-title-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .shelf-title {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .shelf-description {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .shelf-columns {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      min-height: 230px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .shelf-column {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 8px;
+      min-width: 92px;
+    }
+
+    .shelf-column-head {
+      display: grid;
+      gap: 2px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 850;
+      text-align: center;
+    }
+
+    .shelf-column-head span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .shelf-levels {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .shelf-level {
+      display: grid;
+      place-items: center;
+      min-height: 52px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 12px;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent),
+        rgba(23, 31, 44, 0.86);
+      color: var(--muted);
+      cursor: pointer;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .shelf-level:hover,
+    .shelf-level.active {
+      border-color: var(--line-strong);
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    .level-name {
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .level-capacity {
+      margin-top: 2px;
+      color: var(--faint);
+      font-size: 11px;
+    }
+
+    @media (max-width: 1180px) {
+      .app-shell {
         grid-template-columns: 1fr;
       }
 
       .sidebar {
+        position: static;
         min-height: auto;
       }
 
       .nav-list {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 880px) {
+      .topbar,
+      .workflow,
+      .manual-row,
+      .shelf-workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 780px) {
-      .app-frame {
+    @media (max-width: 620px) {
+      .app-shell {
+        padding: 12px;
+      }
+
+      .sidebar,
+      .card {
+        border-radius: 14px;
         padding: 14px;
       }
 
-      .dashboard-grid {
+      .nav-list,
+      .stats-grid,
+      .edit-grid,
+      #items {
         grid-template-columns: 1fr;
       }
 
-      .hero,
       .collection-head {
         display: grid;
       }
 
-      .status-chip {
-        justify-self: start;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .sidebar,
-      .panel,
-      .collection-panel {
-        padding: 14px;
-      }
-
-      .nav-list {
-        grid-template-columns: 1fr;
-      }
-
-      .edit-grid {
-        grid-template-columns: 1fr;
-      }
-
-      #items {
-        grid-template-columns: 1fr;
+      .shelf-columns {
+        min-height: 190px;
       }
 
       .disc-card {
@@ -558,50 +930,58 @@
       }
 
       .cover {
-        min-height: 128px;
+        min-height: 126px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app-frame">
+  <div class="app-shell">
     <aside class="sidebar">
       <div>
-        <div class="brand-mark">
-          <div class="logo">A</div>
-          <div>
+        <div class="brand">
+          <div class="brand-row">
+            <div class="logo">A</div>
             <h1 class="brand-title">Avatra</h1>
-            <p class="tagline">Digital avatars for your physical media.</p>
           </div>
+          <p class="tagline">Kodi knows the movie. Avatra knows the disc.</p>
         </div>
 
-        <nav class="nav-list" aria-label="Dashboard sections">
-          <div class="nav-pill active">Scan</div>
-          <div class="nav-pill">Collection</div>
-          <div class="nav-pill">Metadata</div>
+        <nav class="nav-list" aria-label="Navigation">
+          <div class="nav-item active" onclick="scrollToSection('top')">Accueil</div>
+          <div class="nav-item" onclick="scrollToSection('collection-section')">Collection</div>
+          <div class="nav-item" onclick="scrollToSection('shelves-section')">Bibliothèques</div>
+          <div class="nav-item">Prêts</div>
+          <div class="nav-item">Manquants</div>
+          <div class="nav-item">Statistiques</div>
         </nav>
       </div>
 
-      <div class="footer">Kodi knows the movie. Avatra knows the disc.</div>
+      <div class="api-card">
+        <strong>Avatra v0.1.0</strong>
+        <span>API connectée</span>
+      </div>
     </aside>
 
-    <main class="content">
-      <section class="hero">
+    <main id="top" class="main">
+      <section class="topbar">
         <div>
-          <h2>Physical media command shelf</h2>
-          <p>Scan, confirm, and keep the edition details that matter when the case is in your hand.</p>
+          <h2 class="page-title">Tableau de bord</h2>
+          <p class="page-subtitle">Gérez votre vidéothèque physique.</p>
         </div>
-        <div class="status-chip">Local SQLite library</div>
+        <div class="search-wrap">
+          <input id="search" placeholder="Rechercher un titre, un code-barres...">
+        </div>
       </section>
 
-      <section class="dashboard-grid">
-        <div class="panel scan-card">
+      <section class="workflow">
+        <div class="card scan-card">
           <div>
-            <div class="panel-head">
+            <div class="card-head">
               <div>
-                <div class="kicker">Priority workflow</div>
-                <h3>Scan a barcode</h3>
-                <p class="panel-note">Add a disc and open the last scanned editor in one pass.</p>
+                <div class="kicker">Scan prioritaire</div>
+                <h3>Ajouter par code-barres</h3>
+                <p class="card-note">Scannez un boîtier, créez le disque, puis ajustez les détails techniques.</p>
               </div>
             </div>
 
@@ -612,16 +992,24 @@
           </div>
 
           <div id="status" class="status">Waiting for barcode.</div>
+          <div id="active-shelf-session" class="session-banner hidden"></div>
         </div>
 
-        <div class="side-stack">
-          <div id="last-scanned-panel" class="panel hidden">
-            <div class="panel-head">
-              <div>
-                <div class="kicker">Latest scan</div>
-                <h3>Edit last scanned item</h3>
-                <p class="panel-note">Comma-separate HDR, audio tracks, and subtitles.</p>
-              </div>
+        <div id="last-scanned-panel" class="card latest-card">
+          <div class="card-head">
+            <div>
+              <div class="kicker">Dernier scan</div>
+              <h3>Édition rapide</h3>
+              <p class="card-note">Modifiez le dernier disque créé sans quitter le flux de scan.</p>
+            </div>
+          </div>
+
+          <div id="latest-empty" class="latest-empty">Aucun disque scanné dans cette session.</div>
+
+          <div id="latest-editor" class="hidden">
+            <div class="latest-summary">
+              <div id="latest-title" class="latest-title"></div>
+              <div id="latest-meta" class="latest-meta"></div>
             </div>
 
             <div class="edit-grid">
@@ -673,48 +1061,128 @@
               </label>
             </div>
 
-            <button class="secondary-button" onclick="saveLastScannedItem()">Save</button>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <div>
-                <div class="kicker">Fallback</div>
-                <h3>Add a disc manually</h3>
-                <p class="panel-note">Use this when barcode recognition needs a hand.</p>
-              </div>
-            </div>
-
-            <div class="form-grid">
-              <input id="title" placeholder="Title">
-              <input id="year" placeholder="Year">
-              <select id="media_type">
-                <option value="bluray">Blu-ray</option>
-                <option value="uhd">UHD Blu-ray</option>
-                <option value="dvd">DVD</option>
-              </select>
-              <input id="original_location" placeholder="Storage zone, e.g. A2">
-              <button onclick="addItem()">Add disc</button>
-            </div>
+            <button class="save-button" onclick="saveLastScannedItem()">Save</button>
           </div>
         </div>
       </section>
 
-      <section class="panel collection-panel">
+      <section class="manual-row">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="kicker">Saisie manuelle</div>
+              <h3>Ajouter un disque</h3>
+              <p class="card-note">À utiliser quand la reconnaissance ne suffit pas.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <input id="title" placeholder="Title">
+            <input id="year" placeholder="Year">
+            <select id="media_type">
+              <option value="bluray">Blu-ray</option>
+              <option value="uhd">UHD Blu-ray</option>
+              <option value="dvd">DVD</option>
+            </select>
+            <input id="original_location" placeholder="Storage zone, e.g. A2">
+            <button onclick="addItem()">Add disc</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat">
+            <div id="stat-total" class="stat-value">0</div>
+            <div class="stat-label">Total disques</div>
+          </div>
+          <div class="stat">
+            <div id="stat-bluray" class="stat-value">0</div>
+            <div class="stat-label">Blu-ray</div>
+          </div>
+          <div class="stat">
+            <div id="stat-uhd" class="stat-value">0</div>
+            <div class="stat-label">UHD</div>
+          </div>
+          <div class="stat">
+            <div id="stat-dvd" class="stat-value">0</div>
+            <div class="stat-label">DVD</div>
+          </div>
+          <div class="stat">
+            <div id="stat-loaned" class="stat-value">0</div>
+            <div class="stat-label">Prêtés</div>
+          </div>
+          <div class="stat">
+            <div id="stat-missing" class="stat-value">0</div>
+            <div class="stat-label">Manquants</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="collection-section" class="card collection-card">
         <div class="collection-head">
           <div>
             <div class="kicker">Collection</div>
-            <h3>Disc shelf</h3>
-            <p class="panel-note">Each card is a physical edition, with technical metadata kept close.</p>
+            <h3>Tous les disques</h3>
+            <p class="card-note">Des entrées physiques, avec leurs détails d’édition et de lecture.</p>
           </div>
         </div>
         <div id="items"></div>
+      </section>
+
+      <section id="shelves-section" class="card collection-card">
+        <div class="collection-head">
+          <div>
+            <div class="kicker">Bibliothèques</div>
+            <h3>Carte physique</h3>
+            <p class="card-note">Sélectionnez un niveau pour envoyer les prochains scans vers cette position.</p>
+          </div>
+        </div>
+
+        <div class="shelf-workspace">
+          <div class="shelf-controls">
+            <div class="shelf-form-panel">
+              <div class="card-head">
+                <div>
+                  <div class="kicker">Nouvelle bibliothèque</div>
+                  <h3>Créer un meuble</h3>
+                </div>
+              </div>
+              <div class="form-grid">
+                <input id="shelf_name" placeholder="Nom">
+                <input id="shelf_description" placeholder="Description">
+                <button onclick="createShelf()">Créer la bibliothèque</button>
+              </div>
+            </div>
+
+            <div class="shelf-form-panel">
+              <div class="card-head">
+                <div>
+                  <div class="kicker">Colonne</div>
+                  <h3>Ajouter une colonne</h3>
+                  <p class="card-note">La capacité estimée sert uniquement au dessin.</p>
+                </div>
+              </div>
+              <div class="form-grid">
+                <select id="column_shelf_id"></select>
+                <input id="column_name" placeholder="Nom de colonne">
+                <input id="column_width_cm" type="number" placeholder="Largeur en cm">
+                <input id="column_level_count" type="number" placeholder="Nombre de niveaux">
+                <button onclick="addShelfColumn()">Ajouter la colonne</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="shelves" class="shelf-list"></div>
+        </div>
       </section>
     </main>
   </div>
 
 <script>
 let lastScannedItemId = null;
+let allItems = [];
+let allShelves = [];
+let selectedShelfId = null;
+let activeShelfSession = null;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -723,6 +1191,10 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+}
+
+function scrollToSection(id) {
+  document.getElementById(id)?.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 
 function mediaLabel(value) {
@@ -748,14 +1220,35 @@ function badgeList(values, className = '') {
   return values.map(value => badge(value, className)).join('');
 }
 
+function mediaClass(value) {
+  if (value === 'dvd') {
+    return 'dvd';
+  }
+  if (value === 'uhd') {
+    return 'uhd';
+  }
+  return 'media';
+}
+
+function stockLabel(value) {
+  const labels = {
+    in_stock: 'In stock',
+    on_loan: 'On loan',
+    on_display: 'On display',
+    missing: 'Missing'
+  };
+  return labels[value] || 'In stock';
+}
+
 function compactBadges(item) {
+  const media = mediaLabel(item.media_type);
   return [
-    badge(mediaLabel(item.media_type), 'media'),
+    badge(media, mediaClass(item.media_type)),
     badge(item.resolution),
     badge(item.video_codec),
     badgeList(item.hdr, 'hdr'),
     badgeList(item.audio_tracks, 'audio'),
-    badge(item.region ? `Region ${item.region}` : null),
+    badge(item.region ? `Region ${item.region}` : null, 'region'),
     badge(item.runtime ? `${item.runtime} min` : null),
     badge(item.discs ? `${item.discs} disc${item.discs === 1 ? '' : 's'}` : null)
   ].join('');
@@ -763,10 +1256,14 @@ function compactBadges(item) {
 
 function detailLines(item) {
   return [
+    item.original_location ? `Original location: ${item.original_location}` : null,
+    item.current_location ? `Current location: ${item.current_location}` : null,
+    item.current_state === 'on_loan' && item.holder_name ? `Holder: ${item.holder_name}` : null,
+    item.current_state === 'on_loan' && item.loan_date ? `Loan date: ${item.loan_date}` : null,
     item.aspect_ratio ? `Aspect ratio: ${item.aspect_ratio}` : null,
     item.original_aspect_ratio ? `Original aspect ratio: ${item.original_aspect_ratio}` : null,
-    Array.isArray(item.spoken_languages) && item.spoken_languages.length > 0 ? `Languages: ${item.spoken_languages.join(', ')}` : null,
-    Array.isArray(item.subtitles) && item.subtitles.length > 0 ? `Subtitles: ${item.subtitles.join(', ')}` : null
+    Array.isArray(item.spoken_languages) && item.spoken_languages.length > 0 ? `Langues: ${item.spoken_languages.join(', ')}` : null,
+    Array.isArray(item.subtitles) && item.subtitles.length > 0 ? `Sous-titres: ${item.subtitles.join(', ')}` : null
   ].filter(Boolean);
 }
 
@@ -791,8 +1288,302 @@ function optionalNumber(id) {
   return value ? Number(value) : null;
 }
 
+function shelfLevelLabel(session) {
+  return `${session.shelfName} / ${session.columnName} / Niveau ${session.levelIndex}`;
+}
+
+function updateShelfSessionBanner() {
+  const banner = document.getElementById('active-shelf-session');
+  if (!activeShelfSession) {
+    banner.classList.add('hidden');
+    banner.textContent = '';
+    return;
+  }
+  banner.textContent = `Session active: ${shelfLevelLabel(activeShelfSession)}`;
+  banner.classList.remove('hidden');
+}
+
+function selectShelf(shelfId) {
+  selectedShelfId = shelfId;
+  document.getElementById('column_shelf_id').value = shelfId || '';
+  renderShelves();
+}
+
+function selectShelfLevel(shelfId, shelfName, columnName, levelId, levelIndex) {
+  selectedShelfId = shelfId;
+  activeShelfSession = {
+    shelfId,
+    shelfName,
+    columnName,
+    levelId,
+    levelIndex
+  };
+  document.getElementById('column_shelf_id').value = shelfId || '';
+  updateShelfSessionBanner();
+  renderShelves();
+  document.getElementById('barcode').focus();
+}
+
+function selectShelfLevelById(levelId) {
+  for (const shelf of allShelves) {
+    for (const column of shelf.columns || []) {
+      const level = (column.levels || []).find(candidate => candidate.id === levelId);
+      if (level) {
+        selectShelfLevel(shelf.id, shelf.name, column.name, level.id, level.level_index);
+        return;
+      }
+    }
+  }
+}
+
+function nextShelfPosition(levelId) {
+  return allItems.filter(item => item.shelf_level_id === levelId).length + 1;
+}
+
+function renderShelfOptions() {
+  const select = document.getElementById('column_shelf_id');
+  if (allShelves.length === 0) {
+    select.innerHTML = '<option value="">Créer une bibliothèque d’abord</option>';
+    return;
+  }
+
+  select.innerHTML = allShelves.map(shelf => {
+    const selected = shelf.id === selectedShelfId ? ' selected' : '';
+    return `<option value="${shelf.id}"${selected}>${escapeHtml(shelf.name)}</option>`;
+  }).join('');
+
+  if (!selectedShelfId) {
+    selectedShelfId = allShelves[0].id;
+    select.value = selectedShelfId;
+  }
+}
+
+function renderShelves() {
+  const container = document.getElementById('shelves');
+  renderShelfOptions();
+
+  if (allShelves.length === 0) {
+    container.innerHTML = '<div class="empty-state">Aucune bibliothèque créée.</div>';
+    return;
+  }
+
+  container.innerHTML = allShelves.map(shelf => {
+    const columns = Array.isArray(shelf.columns) ? shelf.columns : [];
+    const selectedClass = shelf.id === selectedShelfId ? ' selected' : '';
+    const columnMarkup = columns.length > 0
+      ? columns.map(column => {
+        const levels = Array.isArray(column.levels) ? column.levels : [];
+        const width = column.width_cm || 60;
+        return `
+          <div class="shelf-column" style="flex: ${width} 1 ${Math.max(width * 2, 92)}px;">
+            <div class="shelf-column-head">
+              ${escapeHtml(column.name)}
+              ${column.width_cm ? `<span>${escapeHtml(column.width_cm)} cm</span>` : ''}
+            </div>
+            <div class="shelf-levels">
+              ${levels.map(level => {
+                const isActive = activeShelfSession && activeShelfSession.levelId === level.id;
+                const capacity = level.estimated_capacity ? `${level.estimated_capacity} estimés` : '';
+                return `
+                  <button
+                    class="shelf-level ${isActive ? 'active' : ''}"
+                    onclick="selectShelfLevelById(${level.id})"
+                  >
+                    <span class="level-name">Niveau ${escapeHtml(level.level_index)}</span>
+                    ${capacity ? `<span class="level-capacity">${escapeHtml(capacity)}</span>` : ''}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('')
+      : '<div class="empty-state">Ajoutez une colonne pour dessiner cette bibliothèque.</div>';
+
+    return `
+      <article class="shelf-card${selectedClass}" onclick="selectShelf(${shelf.id})">
+        <div class="shelf-title-row">
+          <div>
+            <div class="shelf-title">${escapeHtml(shelf.name)}</div>
+            ${shelf.description ? `<div class="shelf-description">${escapeHtml(shelf.description)}</div>` : ''}
+          </div>
+          <span class="badge location">${columns.length} colonne${columns.length > 1 ? 's' : ''}</span>
+        </div>
+        <div class="shelf-columns">${columnMarkup}</div>
+      </article>
+    `;
+  }).join('');
+}
+
+async function loadShelves() {
+  const res = await fetch('/shelves');
+  allShelves = await res.json();
+  if (!selectedShelfId && allShelves.length > 0) {
+    selectedShelfId = allShelves[0].id;
+  }
+  renderShelves();
+  updateShelfSessionBanner();
+}
+
+async function createShelf() {
+  const name = document.getElementById('shelf_name').value.trim();
+  const description = document.getElementById('shelf_description').value.trim();
+  if (!name) {
+    document.getElementById('status').textContent = 'Le nom de la bibliothèque est requis.';
+    return;
+  }
+
+  const res = await fetch('/shelves', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      name,
+      description: description || null
+    })
+  });
+
+  if (!res.ok) {
+    document.getElementById('status').textContent = 'Impossible de créer la bibliothèque.';
+    return;
+  }
+
+  const shelf = await res.json();
+  selectedShelfId = shelf.id;
+  document.getElementById('shelf_name').value = '';
+  document.getElementById('shelf_description').value = '';
+  document.getElementById('status').textContent = 'Bibliothèque créée.';
+  await loadShelves();
+}
+
+async function addShelfColumn() {
+  const shelfId = Number(document.getElementById('column_shelf_id').value);
+  const name = document.getElementById('column_name').value.trim();
+  const widthCm = optionalNumber('column_width_cm');
+  const levelCount = optionalNumber('column_level_count');
+
+  if (!shelfId || !name || !levelCount) {
+    document.getElementById('status').textContent = 'Bibliothèque, nom et nombre de niveaux sont requis.';
+    return;
+  }
+
+  const res = await fetch(`/shelves/${shelfId}/columns`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      name,
+      width_cm: widthCm,
+      level_count: levelCount
+    })
+  });
+
+  if (!res.ok) {
+    document.getElementById('status').textContent = 'Impossible d’ajouter la colonne.';
+    return;
+  }
+
+  selectedShelfId = shelfId;
+  document.getElementById('column_name').value = '';
+  document.getElementById('column_width_cm').value = '';
+  document.getElementById('column_level_count').value = '';
+  document.getElementById('status').textContent = 'Colonne ajoutée.';
+  await loadShelves();
+}
+
+async function assignItemToActiveShelf(item) {
+  if (!activeShelfSession || !item?.id) {
+    return item;
+  }
+
+  const shelfPosition = nextShelfPosition(activeShelfSession.levelId);
+  const res = await fetch(`/items/${item.id}/location`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      shelf_level_id: activeShelfSession.levelId,
+      shelf_position: shelfPosition
+    })
+  });
+
+  if (!res.ok) {
+    document.getElementById('status').textContent = 'Disque ajouté, mais emplacement non assigné.';
+    return item;
+  }
+
+  return await res.json();
+}
+
+function itemSearchText(item) {
+  return [
+    item.title,
+    item.barcode,
+    item.year,
+    item.media_type,
+    item.original_location,
+    item.current_location,
+    item.current_state,
+    item.holder_name,
+    item.loan_date,
+    item.notes,
+    item.resolution,
+    item.video_codec,
+    item.region,
+    ...(Array.isArray(item.hdr) ? item.hdr : []),
+    ...(Array.isArray(item.audio_tracks) ? item.audio_tracks : []),
+    ...(Array.isArray(item.subtitles) ? item.subtitles : [])
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+function updateStats(items) {
+  document.getElementById('stat-total').textContent = items.length;
+  document.getElementById('stat-bluray').textContent = items.filter(item => item.media_type === 'bluray').length;
+  document.getElementById('stat-uhd').textContent = items.filter(item => item.media_type === 'uhd').length;
+  document.getElementById('stat-dvd').textContent = items.filter(item => item.media_type === 'dvd').length;
+  document.getElementById('stat-loaned').textContent = items.filter(item => item.current_state === 'on_loan').length;
+  document.getElementById('stat-missing').textContent = items.filter(item => item.current_state === 'missing').length;
+}
+
+async function updateStock(itemId, state) {
+  let body = null;
+
+  if (state === 'on-loan') {
+    const holderName = prompt('Holder name');
+    if (!holderName || !holderName.trim()) {
+      return;
+    }
+    body = {holder_name: holderName.trim()};
+  }
+
+  if (state === 'on-display') {
+    const displayLocation = prompt('Display location');
+    body = {current_location: displayLocation && displayLocation.trim() ? displayLocation.trim() : null};
+  }
+
+  const options = {method: 'POST'};
+  if (body) {
+    options.headers = {'Content-Type': 'application/json'};
+    options.body = JSON.stringify(body);
+  }
+
+  const res = await fetch(`/items/${itemId}/stock/${state}`, options);
+  if (!res.ok) {
+    document.getElementById('status').textContent = 'Could not update stock state.';
+    return;
+  }
+
+  document.getElementById('status').textContent = 'Stock state updated.';
+  await loadItems();
+}
+
 function fillLastScannedPanel(item) {
   lastScannedItemId = item.id;
+  document.getElementById('latest-empty').classList.add('hidden');
+  document.getElementById('latest-editor').classList.remove('hidden');
+  document.getElementById('latest-title').textContent = item.title || '';
+  document.getElementById('latest-meta').textContent = [
+    mediaLabel(item.media_type),
+    item.year,
+    item.original_location
+  ].filter(Boolean).join(' / ');
   document.getElementById('edit_title').value = item.title || '';
   document.getElementById('edit_year').value = item.year || '';
   document.getElementById('edit_media_type').value = item.media_type || 'bluray';
@@ -807,44 +1598,69 @@ function fillLastScannedPanel(item) {
   document.getElementById('edit_hdr').value = commaText(item.hdr);
   document.getElementById('edit_audio_tracks').value = commaText(item.audio_tracks);
   document.getElementById('edit_subtitles').value = commaText(item.subtitles);
-  document.getElementById('last-scanned-panel').classList.remove('hidden');
 }
 
-async function loadItems() {
-  const res = await fetch('/items');
-  const items = await res.json();
+function renderItems(items) {
   const container = document.getElementById('items');
 
   if (items.length === 0) {
-    container.innerHTML = '<div class="empty-state">No discs yet.</div>';
+    container.innerHTML = '<div class="empty-state">Aucun disque à afficher.</div>';
     return;
   }
 
   container.innerHTML = items.map(item => {
     const lines = detailLines(item);
     const media = mediaLabel(item.media_type);
-    const year = item.year ? `<span>${escapeHtml(item.year)}</span>` : '';
-    const location = item.original_location ? `<span>${escapeHtml(item.original_location)}</span>` : '';
-    const subtitle = [year, location].filter(Boolean).join(' / ');
+    const subtitle = [
+      item.year ? escapeHtml(item.year) : null,
+      item.original_location ? `<span class="badge location">${escapeHtml(item.original_location)}</span>` : null
+    ].filter(Boolean).join(' ');
     return `
       <article class="disc-card">
         <div class="cover">
-          ${media ? `<div class="cover-ribbon">${escapeHtml(media)}</div>` : ''}
+          ${media ? `<div class="cover-ribbon ${escapeHtml(item.media_type || '')}">${escapeHtml(media)}</div>` : ''}
         </div>
         <div class="disc-info">
           <div>
             <div class="disc-title">${escapeHtml(item.title)}</div>
             ${subtitle ? `<div class="disc-subtitle">${subtitle}</div>` : ''}
           </div>
-          ${item.barcode ? `<div class="barcode">Barcode: ${escapeHtml(item.barcode)}</div>` : ''}
+          ${item.barcode ? `<div class="barcode">Code-barres: ${escapeHtml(item.barcode)}</div>` : ''}
+          <div class="stock-row">
+            <span class="stock-badge ${escapeHtml(item.current_state || 'in_stock')}">${escapeHtml(stockLabel(item.current_state))}</span>
+            ${item.current_location ? `<span class="badge location">${escapeHtml(item.current_location)}</span>` : ''}
+          </div>
           <div class="badge-row">${compactBadges(item)}</div>
           <div class="meta-lines">
             ${lines.map(line => `<div class="meta-line">${escapeHtml(line)}</div>`).join('')}
+          </div>
+          <div class="stock-actions">
+            <button class="stock-button" onclick="updateStock(${item.id}, 'in-stock')">In stock</button>
+            <button class="stock-button" onclick="updateStock(${item.id}, 'on-loan')">Loan</button>
+            <button class="stock-button" onclick="updateStock(${item.id}, 'on-display')">Display</button>
+            <button class="stock-button" onclick="updateStock(${item.id}, 'missing')">Missing</button>
           </div>
         </div>
       </article>
     `;
   }).join('');
+}
+
+function applySearch() {
+  const query = document.getElementById('search').value.trim().toLowerCase();
+  if (!query) {
+    renderItems(allItems);
+    return;
+  }
+  renderItems(allItems.filter(item => itemSearchText(item).includes(query)));
+}
+
+async function loadItems() {
+  const res = await fetch('/items');
+  allItems = await res.json();
+  updateStats(allItems);
+  applySearch();
+  renderShelves();
 }
 
 async function lookupBarcode() {
@@ -871,8 +1687,10 @@ async function lookupBarcode() {
     return;
   }
 
-  status.textContent = `Added: ${data.item.title}`;
-  fillLastScannedPanel(data.item);
+  const createdItem = await assignItemToActiveShelf(data.item);
+  const sessionText = activeShelfSession ? ` / ${shelfLevelLabel(activeShelfSession)}` : '';
+  status.textContent = `Added: ${createdItem.title}${sessionText}`;
+  fillLastScannedPanel(createdItem);
 
   barcodeInput.value = '';
   document.getElementById('title').value = '';
@@ -959,7 +1777,14 @@ document.getElementById('barcode').addEventListener('keydown', function(event) {
   }
 });
 
+document.getElementById('search').addEventListener('input', applySearch);
+document.getElementById('column_shelf_id').addEventListener('change', function(event) {
+  selectedShelfId = Number(event.target.value) || null;
+  renderShelves();
+});
+
 loadItems();
+loadShelves();
 </script>
 </body>
 </html>
